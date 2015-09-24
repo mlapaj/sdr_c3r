@@ -1,0 +1,4 @@
+class fourier{
+public:
+    fourier();
+};
