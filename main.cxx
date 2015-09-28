@@ -1,5 +1,4 @@
 #include <iostream>
-#include "DSP/fourier.hxx"
 
 #include <log4cplus/layout.h>
 #include <log4cplus/logger.h>
@@ -7,6 +6,11 @@
 #include <log4cplus/configurator.h>
 #include <log4cplus/loggingmacros.h>
 #include <iomanip>
+#include <vector>
+
+
+#include "DSP/fourier.hxx"
+#include "IO/csv.hxx"
 
 using namespace std;
 using namespace log4cplus;
@@ -21,7 +25,13 @@ int main(){
 	// end of log configuration
 
 	cout << "Starting app.." << endl;
-	fourier oFourier(64);
+	fourier oFourier(1024);
+	vector<double> dane;
+	csv::read_double("test",dane);
+	for (const double i : dane){
+		cout << i << " ";
+	}
+	oFourier.do_fourier(dane);
 	LOG4CPLUS_DEBUG(log, "This is a bool: " << true);
 
 	cout << "Ending app.." << endl;
