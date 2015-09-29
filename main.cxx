@@ -25,13 +25,20 @@ int main(){
 	// end of log configuration
 
 	cout << "Starting app.." << endl;
-	fourier oFourier(1024);
+	fourier oFourier(8);
 	vector<double> dane;
+	vector<complex<double>> out;
 	csv::read_double("test",dane);
 	for (const double i : dane){
 		cout << i << " ";
 	}
-	oFourier.do_fourier(dane);
+	cout << endl;
+	oFourier.do_fourier(dane,out);
+	
+	for (const complex<double> i : out){
+		cout << i << endl;
+	}
+	
 	LOG4CPLUS_DEBUG(log, "This is a bool: " << true);
 
 	cout << "Ending app.." << endl;

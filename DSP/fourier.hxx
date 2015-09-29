@@ -20,6 +20,5 @@ class fourier{
 		Logger logger = Logger::getInstance("fourier");
 	public:
 		fourier(int nPoints);
-		void do_fourier(vector<int> data);
-		void do_fourier(vector<double> data);
+		void do_fourier(vector<double> data,vector<complex<double>> &out);
 };

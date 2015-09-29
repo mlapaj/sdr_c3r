@@ -11,22 +11,16 @@ fourier::fourier(int nPoints){
 	cout << w << endl;
 }
 
-void fourier::do_fourier(vector<int> data){
-	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation");
-	return;
-}
-
-void fourier::do_fourier(vector<double> data){
+void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
+	cout << "test" << endl;
 	complex<double> wsp = 0;
-	int k=0;
-	for (const double sample: data){
-		wsp = 0;
-		for (int n=0;n<nPoints;n++){
-			wsp = wsp +  sample*  pow(w,-k * (n-1));
+	for (int k=0;k<(int) nPoints;++k){
+		complex<double> wsp = 0;
+		for (int n=0;n<nPoints;++n){
+			wsp = wsp + data[n] * pow(w,(-k)*n);
 		}
-		cout << wsp << endl;
-		k++;
+		out.push_back(wsp);
 	}
 	return;
 }
