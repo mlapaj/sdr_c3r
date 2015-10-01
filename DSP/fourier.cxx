@@ -32,48 +32,30 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 	const int N = data.size();
 	const int ileIteracji = log2(N);
-	cout << "N= " << N << "ileIteracji" << ileIteracji;
 	vector<vector<int>> tab(N,vector<int>(ileIteracji));
-	cout << "size of tab" << tab.size();
 
-	// fill first iteration:
-	for (int x=0;x<N;x++){
-		tab[x][0] = x;
+	// fill first row with (1..n) values (first iteration):
+	for (int x=0;x<N;x++){ tab[x][0] = x; }
+
+
+	// create even and odd auxilary vectors
+	vector<int> odd;
+	vector<int> even;
+	for (int k=1;k<N;k+=2){
+		odd.push_back(k);
+		even.push_back(k-1);
 	}
-    cout << endl;
 
-    int rozmiar = N;
+    //radix next iterations
+	int rozmiar = N;
 	for (int j=0;j<ileIteracji-1;j++){
-
-		cout <<"iteracja " << j << endl;
-		vector<int> odd;
-		for (int k=1;k<rozmiar;k+=2){
-			odd.push_back(k);
-		}
-
-		vector<int> even;
-		for (int k=0;k<rozmiar;k+=2){
-			even.push_back(k);
-		}
-
 		vector<int> mytab;
 		for (int k=0;k<(N/rozmiar);k++)
 		{
-			for (int l=0;l<even.size() ;l++)
-			{
-				mytab.push_back(tab[even[l]+k*rozmiar][j]);
-			}
-
-			for (int l=0;l<odd.size() ;l++)
-			{
-				mytab.push_back(tab[odd[l]+k*rozmiar][j]);
-			}
+			for (int l=0;l<rozmiar/2 ;l++){ mytab.push_back(tab[even[l]+k*rozmiar][j]); }
+			for (int l=0;l<rozmiar/2 ;l++){ mytab.push_back(tab[odd[l]+k*rozmiar][j]); }
 		}
-
-		for (int l=0;l<mytab.size();l++){
-			tab[l][j+1] = mytab[l];
-		}
-
+		for (int l=0;l<mytab.size();l++){ tab[l][j+1] = mytab[l];}
 		rozmiar = rozmiar / 2;
 	}
 
