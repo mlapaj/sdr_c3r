@@ -33,7 +33,8 @@ int main(){
 		cout << i << " ";
 	}
 	cout << endl;
-	oFourier.do_fourier(dane,out);
+	// oFourier.do_fourier(dane,out);
+	oFourier.do_fft(dane,out);
 	
 	for (const complex<double> i : out){
 		cout << i << endl;

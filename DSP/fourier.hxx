@@ -21,4 +21,5 @@ class fourier{
 	public:
 		fourier(int nPoints);
 		void do_fourier(vector<double> data,vector<complex<double>> &out);
+		void do_fft(vector<double> data,vector<complex<double>> &out);
 };
