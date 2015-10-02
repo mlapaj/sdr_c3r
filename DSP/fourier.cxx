@@ -41,6 +41,7 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 		cout <<  "---------------" << endl;
 	};
 	const int N = data.size();
+	out.resize(N);
 	const int ileIteracji = log2(N);
 	vector<vector<int>> tab(N,vector<int>(ileIteracji));
 
@@ -89,7 +90,49 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 		++i;
 	}
 
-	print_array(tab);
+	print_array(wsp);
+
+	int pozX;
+	int pozY;
+	int doKtorej = 2;
+	for (int j = ileIteracji-1;j>=0;--j){
+		for (int k=0;k<N-1;k+=2){
+			pozX = tab[k][j];
+			pozY = tab[k+1][j];
+			if (j==ileIteracji-1){
+				double a=data[pozX];
+				double b=data[pozY];
+				int potega = wsp[k+1][j]-1;
+				complex<double> omega = exp((complex<double>(0,float(-1 * 2 * M_PI * potega) / float(doKtorej))));
+				out[k] = a + (omega * b);
+				out[k+1] = a - (omega * b);
+			}
+			else
+			{
+				int ppozx = -1;
+				int ppozy = -1;
+				for (int i=0;i<tab.size();i++){
+					if (tab[i][j+1] == pozX) {
+						ppozx = i;
+						break; }
+				}
+				for (int i=0;i<tab.size();i++){
+					if (tab[i][j+1] == pozY) {
+						ppozy = i;
+						break; }
+				}
+				complex<double> a = out[ppozx];
+				complex<double> b = out[ppozy];
+
+				int potega = wsp[ppozy][j]-1;
+				complex<double> omega = exp(complex<double>(0,float(-1 * 2 * M_PI * potega) / (float) doKtorej));
+
+				out[ppozx] = a + (omega * b);
+				out[ppozy] = a - (omega * b);
+			}
+		}
+		doKtorej = doKtorej*2;
+	}
 
 	return;
 
