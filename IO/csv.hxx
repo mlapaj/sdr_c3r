@@ -17,5 +17,5 @@ class csv{
 		static char block[blockSize];
 	public:
 		static int read_int(string filename,vector<int> &array);
-		static int read_double(string filename,vector<double> &array);
+		static int read_double(string filename,vector<double> &array,int howMany = 0);
 };

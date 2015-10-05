@@ -8,22 +8,21 @@ fourier::fourier(int nPoints){
 	LOG4CPLUS_DEBUG(logger, "Starting constructor...");
 	this->nPoints = nPoints;
 	w = exp(complex<double>(0,2*M_PI/(double)nPoints));
-	cout << w << endl;
-
-
-
 }
 
 void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
+	out.resize(nPoints);
+	benchmark_timer btimer;
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
-			wsp = wsp + data[n] * pow(w,(-k)*n);
+			wsp = wsp + data.at(n) * pow(w,(-k)*n);
 		}
 		out.push_back(wsp);
 	}
+	btimer.print();
 	return;
 }
 
@@ -40,7 +39,7 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 
 		cout <<  "---------------" << endl;
 	};
-	const int N = data.size();
+	const int N = nPoints;
 	out.resize(N);
 	const int ileIteracji = log2(N);
 	vector<vector<int>> tab(N,vector<int>(ileIteracji));
@@ -70,7 +69,7 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 		rozmiar = rozmiar / 2;
 	}
 
-	print_array(tab);
+	// print_array(tab);
 
 
 
@@ -90,22 +89,52 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 		++i;
 	}
 
-	print_array(wsp);
+	// print_array(wsp);
 
-	int pozX;
-	int pozY;
+	vector<complex<double>>  test(ileIteracji*N);
+	int pozX=0;
+	int pozY=0;
 	int doKtorej = 2;
+
+
 	for (int j = ileIteracji-1;j>=0;--j){
 		for (int k=0;k<N-1;k+=2){
 			pozX = tab[k][j];
 			pozY = tab[k+1][j];
 			if (j==ileIteracji-1){
-				double a=data[pozX];
-				double b=data[pozY];
 				int potega = wsp[k+1][j]-1;
 				complex<double> omega = exp((complex<double>(0,float(-1 * 2 * M_PI * potega) / float(doKtorej))));
-				out[k] = a + (omega * b);
-				out[k+1] = a - (omega * b);
+				test[j*N+k] = omega;
+			}
+			else
+			{
+				int ppozy = -1;
+				for (int i=0;i<tab.size();i++){
+					if (tab[i][j+1] == pozY) {
+						ppozy = i;
+						break; }
+				}
+				int potega = wsp[ppozy][j]-1;
+				complex<double> omega = exp(complex<double>(0,float(-1 * 2 * M_PI * potega) / (float) doKtorej));
+				test[j*N+k] = omega;
+			}
+		}
+		doKtorej = doKtorej*2;
+	}
+
+	pozX=0;
+	pozY=0;
+	doKtorej = 2;
+	benchmark_timer btimer;
+	for (int j = ileIteracji-1;j>=0;--j){
+		for (int k=0;k<N-1;k+=2){
+			pozX = tab[k][j];
+			pozY = tab[k+1][j];
+			if (j==ileIteracji-1){
+				double a=data.at(pozX);
+				double b=data.at(pozY);
+				out[k] = a + (test[j*N+k]  * b);
+				out[k+1] = a - (test[j*N+k]  * b);
 			}
 			else
 			{
@@ -124,90 +153,16 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 				complex<double> a = out[ppozx];
 				complex<double> b = out[ppozy];
 
-				int potega = wsp[ppozy][j]-1;
-				complex<double> omega = exp(complex<double>(0,float(-1 * 2 * M_PI * potega) / (float) doKtorej));
-
-				out[ppozx] = a + (omega * b);
-				out[ppozy] = a - (omega * b);
+				out[ppozx] = a + (test[j*N+k] * b);
+				out[ppozy] = a - (test[j*N+k] * b);
 			}
 		}
 		doKtorej = doKtorej*2;
 	}
-
+	btimer.print();
 	return;
 
 
 }
 
 
-/*
-
-	for (int x=0;x<N;x++){ wsp[x][0] = x+1; }
-	cout << "wsp" << endl;
-	for (vector<int> x:wsp){
-		cout << x[0] << " ";
-	}
-	cout << endl;
-
-	int podzial = N / 2;
-
-	for (int j=0;j<ileIteracji;j++){
-		if (j == 0){
-			vector<int> zeros(podzial);
-			vector<int> t;
-			t.insert(t.end(),zeros.begin(),zeros.end());
-			for (int l=0;l<podzial;l++){
-				for (int n=0;n<wsp.size();n++){
-					t.push_back(wsp[n][j]);
-				}
-			}
-
-			for(int k=0;k<wsp.size();k++){
-				wsp[k][j] = t[k];
-			}
-		}
-		else
-		{
-			int start = wsp.size()-podzial;
-			int koniec = wsp.size();
-			vector<int> toAdd;
-			for (int l=start;l<koniec;++l)
-			{
-				toAdd.push_back(wsp[l][j-1]);
-			}
-			cout << "toAdd";
-			for (int x: toAdd){
-				cout << x << " ";
-			}
-			cout << endl;
-			// even = 1:2:size(toAdd,1);
-			vector<int> even;
-			for (int i=0;i<toAdd.size();i+=2){
-				even.push_back(i);
-			}
-			vector<int> dodanie;
-			for (int k=0;k<N/podzial;k++){
-				for (int l=0;l<(podzial/2);l++){
-					dodanie.push_back(0);
-				}
-				cout << "zeros" << dodanie.size() << endl; 
-				for (int l=0;l<(toAdd.size()/2);l++){
-					dodanie.push_back(toAdd[l]);
-				}
-				cout << "dodanie" << dodanie.size() << endl; 
-			}
-			cout << "dodanie size: " << dodanie.size() << endl;
-			for (int l=0;l<dodanie.size();l++){ wsp[l][j] = dodanie[l];}
-			podzial = podzial / 2;
-		}
-	}
-
-
-	for (vector<int> x:wsp){
-		for (int y: x){
-			cout << y << "\t";
-		}
-		cout << endl;
-	}
-
-*/

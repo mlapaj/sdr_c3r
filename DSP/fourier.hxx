@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <complex>
 #include <vector>
-
+#include "../MISC/benchmark_timer.hxx"
 
 using namespace std;
 using namespace log4cplus;

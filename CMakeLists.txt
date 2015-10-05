@@ -18,6 +18,7 @@ endif()
 
 add_subdirectory(DSP)
 add_subdirectory(IO)
+add_subdirectory(MISC)
 
 # find google test
 enable_testing()
@@ -27,7 +28,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r DSP IO log4cplus)
+target_link_libraries(sdr_c3r DSP IO MISC log4cplus)
 
 # for testing
 add_executable(tests tests.cxx)
