@@ -7,6 +7,7 @@
 #include <log4cplus/loggingmacros.h>
 #include <iomanip>
 #include <vector>
+#include <limits>
 
 
 #include "DSP/fourier.hxx"
@@ -27,7 +28,7 @@ int main(){
 	cout << "Starting app.." << endl;
 
 	int nPoints = 4;
-	for (nPoints=2;nPoints<=8192;nPoints = nPoints * 2)
+	for (nPoints=2;nPoints<=4096;nPoints = nPoints * 2)
 	{
 		cout << "calculating FFT for " << nPoints << " points." << fixed <<endl;
 		fourier oFourier(nPoints);
@@ -52,6 +53,15 @@ int main(){
 //				cout << fixed  << i << endl;
 //			}
 
+		for (int x=0;x<dane.size();x++)
+		{
+			if (abs(dane[x]-out2[x]) > 0.00001 ){
+				cout << "!error! ";
+				cout << "dane: " << dane[x] << " out2: " << out2[x] << endl;
+				return -1;
+			}
+		}
+
 		oFourier.do_fft(dane,out3);
 
 //		for (const complex<double> i : out3){
@@ -59,6 +69,16 @@ int main(){
 //		}
 
 		oFourier.do_inv_fft(out3,out4);
+
+
+		for (int x=0;x<dane.size();x++)
+		{
+			if (abs(dane[x]-out4[x]) > 0.00001 ){
+				cout << "!error! ";
+				cout << "dane: " << dane[x] << " out2: " << out2[x] << endl;
+				return -1;
+			}
+		}
 
 //		for (const double i : out4){
 //			cout << i << endl;
