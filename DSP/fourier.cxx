@@ -20,7 +20,7 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 		for (int n=0;n<nPoints;++n){
 			wsp = wsp + data.at(n) * pow(w,(-k)*n);
 		}
-		out.push_back(wsp);
+		out.at(k) = wsp;
 	}
 	btimer.print();
 	return;
@@ -91,10 +91,12 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 
 	// print_array(wsp);
 
-	vector<complex<double>>  test(ileIteracji*N);
-	int pozX=0;
-	int pozY=0;
-	int doKtorej = 2;
+	vector<complex<double>>  test(ileIteracji*N);	
+    vector<int>  tppozx(ileIteracji*N);	
+    vector<int>  tppozy(ileIteracji*N);	
+	unsigned int pozX=0;
+	unsigned int pozY=0;
+	unsigned int doKtorej = 2;
 
 
 	for (int j = ileIteracji-1;j>=0;--j){
@@ -105,15 +107,29 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 				int potega = wsp[k+1][j]-1;
 				complex<double> omega = exp((complex<double>(0,float(-1 * 2 * M_PI * potega) / float(doKtorej))));
 				test[j*N+k] = omega;
+
+				tppozx[j*N+k] = pozX;
+				tppozy[j*N+k] = pozY;
 			}
 			else
 			{
-				int ppozy = -1;
+
+				unsigned int ppozx;
+				unsigned int ppozy;
+				for (int i=0;i<tab.size();i++){
+					if (tab[i][j+1] == pozX) {
+						ppozx = i;
+						break; }
+				}
 				for (int i=0;i<tab.size();i++){
 					if (tab[i][j+1] == pozY) {
 						ppozy = i;
 						break; }
 				}
+
+				tppozx[j*N+k] = ppozx;
+				tppozy[j*N+k] = ppozy;
+
 				int potega = wsp[ppozy][j]-1;
 				complex<double> omega = exp(complex<double>(0,float(-1 * 2 * M_PI * potega) / (float) doKtorej));
 				test[j*N+k] = omega;
@@ -128,36 +144,24 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 	benchmark_timer btimer;
 	for (int j = ileIteracji-1;j>=0;--j){
 		for (int k=0;k<N-1;k+=2){
-			pozX = tab[k][j];
-			pozY = tab[k+1][j];
+			const int pos = j*N+k;
 			if (j==ileIteracji-1){
-				double a=data.at(pozX);
-				double b=data.at(pozY);
-				out[k] = a + (test[j*N+k]  * b);
-				out[k+1] = a - (test[j*N+k]  * b);
+				double a=data[tppozx[pos]];
+				double b=data[tppozy[pos]];
+				out[k] = a + (test[pos]  * b);
+				out[k+1] = a - (test[pos]  * b);
 			}
 			else
 			{
-				int ppozx = -1;
-				int ppozy = -1;
-				for (int i=0;i<tab.size();i++){
-					if (tab[i][j+1] == pozX) {
-						ppozx = i;
-						break; }
-				}
-				for (int i=0;i<tab.size();i++){
-					if (tab[i][j+1] == pozY) {
-						ppozy = i;
-						break; }
-				}
+				unsigned int ppozx = tppozx[pos];
+				unsigned int ppozy = tppozy[pos];
 				complex<double> a = out[ppozx];
 				complex<double> b = out[ppozy];
 
-				out[ppozx] = a + (test[j*N+k] * b);
-				out[ppozy] = a - (test[j*N+k] * b);
+				out[ppozx] = a + (test[pos] * b);
+				out[ppozy] = a - (test[pos] * b);
 			}
 		}
-		doKtorej = doKtorej*2;
 	}
 	btimer.print();
 	return;

@@ -27,25 +27,29 @@ int main(){
 	cout << "Starting app.." << endl;
 
 	int nPoints = 1024;
-	fourier oFourier(nPoints);
-	vector<double> dane;
-	vector<complex<double>> out1;
-	vector<complex<double>> out2;
-	csv::read_double("test",dane,nPoints);
-	for (const double i : dane){
-		cout << i << " ";
+	for (nPoints=2;nPoints<=16;nPoints = nPoints * 2)
+	{
+		cout << "calculating FFT for " << nPoints << " points.";
+		fourier oFourier(nPoints);
+		vector<double> dane;
+		vector<complex<double>> out1;
+		vector<complex<double>> out2;
+		csv::read_double("test",dane,nPoints);
+		//for (const double i : dane){
+		//	cout << i << " ";
+		//}
+		cout << endl;
+
+		oFourier.do_fourier(dane,out1);
+		    for (const complex<double> i : out1){
+				cout << fixed  << i << endl;
+			}
+		oFourier.do_fft(dane,out2);
+
+			for (const complex<double> i : out2){
+				cout << i << endl;
+			}
 	}
-	cout << endl;
-	
-	oFourier.do_fourier(dane,out1);
-    //for (const complex<double> i : out1){
-	//	cout << i << endl;
-	//}
-	oFourier.do_fft(dane,out2);
-	
-	//for (const complex<double> i : out2){
-	//	cout << i << endl;
-	//}
 	
 	LOG4CPLUS_DEBUG(log, "This is a bool: " << true);
 
