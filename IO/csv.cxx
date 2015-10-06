@@ -40,3 +40,21 @@ int csv::read_double(string filename,vector<double> &array,int howMany){
 	return 0;
 }
 
+
+
+int csv::save_double(string filename,vector<double> &array,int howMany){
+	LOG4CPLUS_DEBUG(logger,"openning file: " << filename << " for reading");
+	ofstream file(filename);
+	if (file.is_open()){
+			LOG4CPLUS_DEBUG(logger,"file oppened successfully");
+			int count = 0;
+			while (count < array.size()){
+				double i = array[count];
+				char c = ',';
+				file << i;
+				if ((howMany > 0) && (++count >= howMany)) break;
+				file << c;
+			}
+	}
+	return 0;
+}

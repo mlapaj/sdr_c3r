@@ -18,4 +18,5 @@ class csv{
 	public:
 		static int read_int(string filename,vector<int> &array);
 		static int read_double(string filename,vector<double> &array,int howMany = 0);
+		static int save_double(string filename,vector<double> &array,int howMany = 0);
 };

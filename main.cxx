@@ -26,29 +26,43 @@ int main(){
 
 	cout << "Starting app.." << endl;
 
-	int nPoints = 1024;
-	for (nPoints=2;nPoints<=16;nPoints = nPoints * 2)
+	int nPoints = 4;
+	for (nPoints=2;nPoints<=8192;nPoints = nPoints * 2)
 	{
-		cout << "calculating FFT for " << nPoints << " points.";
+		cout << "calculating FFT for " << nPoints << " points." << fixed <<endl;
 		fourier oFourier(nPoints);
 		vector<double> dane;
 		vector<complex<double>> out1;
-		vector<complex<double>> out2;
+		vector<double> out2;
+		vector<complex<double>> out3;
+		vector<double> out4;
 		csv::read_double("test",dane,nPoints);
-		//for (const double i : dane){
-		//	cout << i << " ";
-		//}
-		cout << endl;
+//		for (const double i : dane){
+//			cout << i << " " << endl;
+//		}
 
 		oFourier.do_fourier(dane,out1);
-		    for (const complex<double> i : out1){
-				cout << fixed  << i << endl;
-			}
-		oFourier.do_fft(dane,out2);
+//		    for (const complex<double> i : out1){
+//				cout << fixed  << i << endl;
+//			}
 
-			for (const complex<double> i : out2){
-				cout << i << endl;
-			}
+		oFourier.do_inv_fourier(out1,out2);
+//		cout << "inv" << endl;
+//		    for (const double i : out2){
+//				cout << fixed  << i << endl;
+//			}
+
+		oFourier.do_fft(dane,out3);
+
+//		for (const complex<double> i : out3){
+//			cout << i << endl;
+//		}
+
+		oFourier.do_inv_fft(out3,out4);
+
+//		for (const double i : out4){
+//			cout << i << endl;
+//		}
 	}
 	
 	LOG4CPLUS_DEBUG(log, "This is a bool: " << true);
