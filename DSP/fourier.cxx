@@ -133,7 +133,6 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
-	benchmark_timer btimer;
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
@@ -141,7 +140,6 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 		}
 		out.at(k) = wsp;
 	}
-	btimer.print();
 	return;
 }
 
@@ -150,7 +148,6 @@ void fourier::do_fourier(vector<complex<double>> data,vector<complex<double>> &o
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
-	benchmark_timer btimer;
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
@@ -158,7 +155,6 @@ void fourier::do_fourier(vector<complex<double>> data,vector<complex<double>> &o
 		}
 		out.at(k) = wsp;
 	}
-	btimer.print();
 	return;
 }
 
@@ -166,7 +162,6 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<double> &out){
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
-	benchmark_timer btimer;
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
@@ -174,7 +169,6 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<double> &out){
 		}
 		out.at(k) = abs(wsp)/nPoints;
 	}
-	btimer.print();
 	return;
 }
 
@@ -184,7 +178,6 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<complex<double>
 	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
-	benchmark_timer btimer;
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
@@ -193,14 +186,12 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<complex<double>
 		// todo 
 		out.at(k) = wsp / (double) nPoints;
 	}
-	btimer.print();
 	return;
 }
 
 void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 	out.resize(nPoints);
 
-	benchmark_timer btimer;
 	for (int j = nFFTIterations-1;j>=0;--j){
 		for (int k=0;k<nPoints-1;k+=2){
 			const int pos = j*nPoints+k;
@@ -222,7 +213,6 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 			}
 		}
 	}
-	btimer.print();
 	return;
 }
 
@@ -230,7 +220,6 @@ void fourier::do_fft(vector<double> data,vector<complex<double>> &out){
 void fourier::do_fft(vector<complex<double>> data,vector<complex<double>> &out){
 	out.resize(nPoints);
 
-	benchmark_timer btimer;
 	for (int j = nFFTIterations-1;j>=0;--j){
 		for (int k=0;k<nPoints-1;k+=2){
 			const int pos = j*nPoints+k;
@@ -252,7 +241,6 @@ void fourier::do_fft(vector<complex<double>> data,vector<complex<double>> &out){
 			}
 		}
 	}
-	btimer.print();
 	return;
 }
 
@@ -262,7 +250,6 @@ void fourier::do_inv_fft(vector<complex<double>> data,vector<double> &out){
 	t_out.resize(nPoints);
 	out.resize(nPoints);
 
-	benchmark_timer btimer;
 	for (int j = nFFTIterations-1;j>=0;--j){
 		for (int k=0;k<nPoints-1;k+=2){
 			const int pos = j*nPoints+k;
@@ -287,7 +274,6 @@ void fourier::do_inv_fft(vector<complex<double>> data,vector<double> &out){
 	for (int i=0;i<out.size();i++){
 		out[i] = abs(t_out[i] / (double) nPoints);
 	}
-	btimer.print();
 	return;
 }
 
@@ -298,7 +284,6 @@ void fourier::do_inv_fft(vector<complex<double>> data,vector<complex<double>> &o
 	t_out.resize(nPoints);
 	out.resize(nPoints);
 
-	benchmark_timer btimer;
 	for (int j = nFFTIterations-1;j>=0;--j){
 		for (int k=0;k<nPoints-1;k+=2){
 			const int pos = j*nPoints+k;
@@ -324,6 +309,5 @@ void fourier::do_inv_fft(vector<complex<double>> data,vector<complex<double>> &o
 
 		out[i] = t_out[i] / (double) nPoints;
 	}
-	btimer.print();
 	return;
 }
