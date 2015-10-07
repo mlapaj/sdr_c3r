@@ -25,9 +25,68 @@ int main(){
 	log.addAppender(append);
 	// end of log configuration
 
+	int nPoints;
 	cout << "Starting app.." << endl;
+	for (int nPoints=2;nPoints<8192;nPoints = nPoints *2)
+	{
+		cout << "********** fourier complex " << nPoints << " points **********************" << fixed  << endl;
+		vector<complex<double>> data_complex;
+		vector<complex<double>> out1_complex;
+		vector<complex<double>> out2_complex;
+		vector<complex<double>> out3_complex;
+		vector<complex<double>> out4_complex;
+		csv::read("testcx",data_complex,nPoints);
+	//		for (const complex<double> i : data_complex){
+	//			cout << i << " " << endl;
+	//		}
+		fourier ocFourier(nPoints);
+		cout << "fourier" << endl;
+		ocFourier.do_fourier(data_complex,out1_complex);
+	//	for (const complex<double> i : out1_complex){
+	//		cout << i << " " << endl;
+	//	}
 
-	int nPoints = 4;
+		cout << "inv_fourier" << endl;
+		ocFourier.do_inv_fourier(out1_complex,out2_complex);
+	//	for (const complex<double> i : out2_complex){
+	//		cout << i << " " << endl;
+	//	}
+		for (int x=0;x<data_complex.size();x++)
+		{
+			if (abs(data_complex[x]-out2_complex[x]) > 0.00001 ){
+				cout << "!error! ";
+				cout << "dane: " << data_complex[x] << " out2: " << out2_complex[x] << endl;
+				return -1;
+			}
+		}
+
+		cout << "fft" << endl;
+		ocFourier.do_fft(data_complex,out3_complex);
+	//	for (const complex<double> i : out3_complex){
+	//		cout << i << " " << endl;
+	//	}
+
+		cout << "inv_fft" << endl;
+		ocFourier.do_inv_fft(out3_complex,out4_complex);
+	//	for (const complex<double> i : out4_complex){
+	//		cout << i << " " << endl;
+	//	}
+
+		for (int x=0;x<data_complex.size();x++)
+		{
+			if (abs(data_complex[x]-out4_complex[x]) > 0.00001 ){
+				cout << "!error! ";
+				cout << "dane: " << data_complex[x] << " out2: " << out4_complex[x] << endl;
+				return -1;
+			}
+		}
+	}
+
+	return 0;
+
+
+
+
 	for (nPoints=2;nPoints<=4096;nPoints = nPoints * 2)
 	{
 		cout << "calculating FFT for " << nPoints << " points." << fixed <<endl;
@@ -37,7 +96,7 @@ int main(){
 		vector<double> out2;
 		vector<complex<double>> out3;
 		vector<double> out4;
-		csv::read_double("test",dane,nPoints);
+		csv::read("test",dane,nPoints);
 //		for (const double i : dane){
 //			cout << i << " " << endl;
 //		}

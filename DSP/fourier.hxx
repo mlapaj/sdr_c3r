@@ -32,7 +32,11 @@ class fourier{
 	public:
 		fourier(int nPoints);
 		void do_fourier(vector<double> data,vector<complex<double>> &out);
+		void do_fourier(vector<complex<double>> data,vector<complex<double>> &out);
 		void do_inv_fourier(vector<complex<double>> data,vector<double> &out);
+		void do_inv_fourier(vector<complex<double>> data,vector<complex<double>> &out);
 		void do_fft(vector<double> data,vector<complex<double>> &out);
+		void do_fft(vector<complex<double>> data,vector<complex<double>> &out);
 		void do_inv_fft(vector<complex<double>> data,vector<double> &out);
+		void do_inv_fft(vector<complex<double>> data,vector<complex<double>> &out);
 };
