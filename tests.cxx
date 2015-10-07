@@ -5,104 +5,203 @@
 #include <sstream>
 const string samples_dir = "./test_data/";
 const string complex_samples = "random_complex_8192";
+const string samples = "random_8192";
 const string complex_samples_dft = "random_complex_dft_";
+const string samples_dft = "random_dft_";
 
 using namespace std;
-TEST(MathTest, Fourier_Complex) {
+TEST(DSPTest, Fourier_Complex) {
 	int nPoints = 2;
 	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
 	{
 		cout << "Testing " << nPoints << " points."<<endl;
-		vector<complex<double>> data_complex;
-		vector<complex<double>> out_complex;
-		vector<complex<double>> compare_complex;
+		vector<complex<double>> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
 		fourier oFourier(nPoints);
 
-		csv::read(samples_dir+complex_samples,data_complex,nPoints);
+		csv::read(samples_dir+complex_samples,data,nPoints);
 
-		oFourier.do_fourier(data_complex,out_complex);
+		oFourier.do_fourier(data,out);
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),compare_complex,nPoints);
-		EXPECT_EQ(out_complex.size(), compare_complex.size());
-		for (int i=0;i<compare_complex.size();i++){
-			EXPECT_NEAR(out_complex[i].real(),compare_complex[i].real(),0.00001);
-			EXPECT_NEAR(out_complex[i].imag(),compare_complex[i].imag(),0.00001);
-		}
-	}
-}
-
-
-TEST(MathTest, Inv_Fourier_Complex) {
-	int nPoints = 2;
-	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
-	{
-		cout << "Testing " << nPoints << " points."<<endl;
-		vector<complex<double>> data_complex;
-		vector<complex<double>> out_complex;
-		vector<complex<double>> compare_complex;
-		fourier oFourier(nPoints);
-
-		stringstream ss;
-		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),data_complex,nPoints);
-
-		oFourier.do_inv_fourier(data_complex,out_complex);
-		csv::read(samples_dir+complex_samples,compare_complex,nPoints);
-		EXPECT_EQ(out_complex.size(), compare_complex.size());
-		for (int i=0;i<compare_complex.size();i++){
-			EXPECT_NEAR(out_complex[i].real(),compare_complex[i].real(),0.00001);
-			EXPECT_NEAR(out_complex[i].imag(),compare_complex[i].imag(),0.00001);
+		csv::read(ss.str(),compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.00001);
 		}
 	}
 }
 
 
 
-TEST(MathTest, Inv_FFT_Complex) {
+TEST(DSPTest, Fourier) {
 	int nPoints = 2;
 	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
 	{
 		cout << "Testing " << nPoints << " points."<<endl;
-		vector<complex<double>> data_complex;
-		vector<complex<double>> out_complex;
-		vector<complex<double>> compare_complex;
+		vector<double> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
 		fourier oFourier(nPoints);
-
+		csv::read(samples_dir+samples,data,nPoints);
+		oFourier.do_fourier(data,out);
 		stringstream ss;
-		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),data_complex,nPoints);
-
-		oFourier.do_inv_fft(data_complex,out_complex);
-		csv::read(samples_dir+complex_samples,compare_complex,nPoints);
-		EXPECT_EQ(out_complex.size(), compare_complex.size());
-		for (int i=0;i<compare_complex.size();i++){
-			EXPECT_NEAR(out_complex[i].real(),compare_complex[i].real(),0.00001);
-			EXPECT_NEAR(out_complex[i].imag(),compare_complex[i].imag(),0.00001);
+		ss << samples_dir << samples_dft << nPoints;
+		csv::read(ss.str(),compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.0001);
 		}
 	}
 }
 
-TEST(MathTest, FFT_Complex) {
+
+TEST(DSPTest, Inv_Fourier_Complex) {
 	int nPoints = 2;
 	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
 	{
 		cout << "Testing " << nPoints << " points."<<endl;
-		vector<complex<double>> data_complex;
-		vector<complex<double>> out_complex;
-		vector<complex<double>> compare_complex;
+		vector<complex<double>> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
 		fourier oFourier(nPoints);
 
-		csv::read(samples_dir+complex_samples,data_complex,nPoints);
-
-		oFourier.do_fft(data_complex,out_complex);
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),compare_complex,nPoints);
-		EXPECT_EQ(out_complex.size(), compare_complex.size());
-		for (int i=0;i<compare_complex.size();i++){
-			EXPECT_NEAR(out_complex[i].real(),compare_complex[i].real(),0.0001);
-			EXPECT_NEAR(out_complex[i].imag(),compare_complex[i].imag(),0.0001);
+		csv::read(ss.str(),data,nPoints);
+
+		oFourier.do_inv_fourier(data,out);
+		csv::read(samples_dir+complex_samples,compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.00001);
+		}
+	}
+}
+
+
+
+TEST(DSPTest, Inv_Fourier) {
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<complex<double>> data;
+		vector<double> out;
+		vector<double> compare;
+		fourier oFourier(nPoints);
+
+		stringstream ss;
+		ss << samples_dir << samples_dft << nPoints;
+		csv::read(ss.str(),data,nPoints);
+
+		oFourier.do_inv_fourier(data,out);
+		csv::read(samples_dir+samples,compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i],compare[i],0.00001);
+		}
+	}
+}
+
+
+TEST(DSPTest, FFT_Complex) {
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<complex<double>> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
+		fourier oFourier(nPoints);
+
+		csv::read(samples_dir+complex_samples,data,nPoints);
+
+		oFourier.do_fft(data,out);
+		stringstream ss;
+		ss << samples_dir << complex_samples_dft << nPoints;
+		csv::read(ss.str(),compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.0001);
+		}
+	}
+}
+
+
+TEST(DSPTest, FFT) {
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<double> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
+		fourier oFourier(nPoints);
+
+		csv::read(samples_dir+samples,data,nPoints);
+
+		oFourier.do_fft(data,out);
+		stringstream ss;
+		ss << samples_dir << samples_dft << nPoints;
+		csv::read(ss.str(),compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.0001);
+		}
+	}
+}
+
+TEST(DSPTest, Inv_FFT_Complex) {
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<complex<double>> data;
+		vector<complex<double>> out;
+		vector<complex<double>> compare;
+		fourier oFourier(nPoints);
+
+		stringstream ss;
+		ss << samples_dir << complex_samples_dft << nPoints;
+		csv::read(ss.str(),data,nPoints);
+
+		oFourier.do_inv_fft(data,out);
+		csv::read(samples_dir+complex_samples,compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
+			EXPECT_NEAR(out[i].imag(),compare[i].imag(),0.00001);
+		}
+	}
+}
+
+
+TEST(DSPTest, Inv_FFT) {
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 8192;nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<complex<double>> data;
+		vector<double> out;
+		vector<double> compare;
+		fourier oFourier(nPoints);
+
+		stringstream ss;
+		ss << samples_dir << samples_dft << nPoints;
+		csv::read(ss.str(),data,nPoints);
+
+		oFourier.do_inv_fft(data,out);
+		csv::read(samples_dir+samples,compare,nPoints);
+		EXPECT_EQ(out.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out[i],compare[i],0.00001);
 		}
 	}
 }
