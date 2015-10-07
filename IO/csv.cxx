@@ -74,9 +74,9 @@ int csv::read(string filename,vector<complex<double>> &array,int howMany){
 				file >> i;
 				file >> j;
 				file >> c;
-				if (c!='i') break;
+	//			if (c!='i') break; // do exeption
 				file >> c;
-				if (c!=',') break;
+	//			if (c!=',') break; // do excepton
 				if ((howMany > 0) && (--timer < 0)) break;
 				array.push_back(complex<double>(i,j));
 			}

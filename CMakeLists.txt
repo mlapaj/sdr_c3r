@@ -32,5 +32,6 @@ target_link_libraries(sdr_c3r DSP IO MISC log4cplus)
 
 # for testing
 add_executable(tests tests.cxx)
-target_link_libraries(tests ${GTEST_BOTH_LIBRARIES} pthread log4cplus)
+target_link_libraries(tests DSP IO MISC ${GTEST_BOTH_LIBRARIES} pthread log4cplus)
 
+file(COPY test_data DESTINATION .)
