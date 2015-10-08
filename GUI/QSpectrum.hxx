@@ -15,8 +15,9 @@ public:
 	}
 
 protected:
+	QPainter painter;
 	QTimer timer;
-	QRgb *pixels;
+    unsigned char *pixels;
 	QImage *image;
 	void paintEvent(QPaintEvent *event);
 
