@@ -1,1 +1,1 @@
-add_library(GUI spectrum.cxx)
+add_library(GUI QSpectrum.cxx)

@@ -1,8 +1,7 @@
 #include <qwidget.h>
+// http://www.kuqin.com/qtdocument/designer-manual-6.html
 
-
-
-class spectrum
+class spectrum: public QWidget
 {
 public:
 	spectrum ();

@@ -15,6 +15,8 @@
 #include "DSP/fourier.hxx"
 #include "IO/csv.hxx"
 
+#include "GUI/QSpectrum.hxx"
+
 using namespace std;
 using namespace log4cplus;
 
@@ -31,7 +33,8 @@ int main(int argc,char **argv){
 	cout << "Starting app.." << endl;
 	
 	QApplication app(argc, argv);
-    QLabel hello("Hello world!");
+    //QLabel hello("Hello world!");
+	
 	
 	hello.show();
     return app.exec();
