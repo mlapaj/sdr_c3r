@@ -16,6 +16,8 @@
 #include "IO/csv.hxx"
 
 #include "GUI/QSpectrum.hxx"
+#include <QTimer>
+
 
 using namespace std;
 using namespace log4cplus;
@@ -31,12 +33,14 @@ int main(int argc,char **argv){
 
 	int nPoints;
 	cout << "Starting app.." << endl;
-	
+
 	QApplication app(argc, argv);
+	QSpectrum spectrum;
     //QLabel hello("Hello world!");
-	
-	
-	hello.show();
+
+	//hello.show();
+	spectrum.show();
+
     return app.exec();
 
 	cout << "Ending app.." << endl;
