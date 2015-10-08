@@ -19,6 +19,10 @@ else()
 endif()
 
 
+
+# Find the QtWidgets library
+find_package(Qt5Widgets)
+
 # the compile lines.
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
@@ -28,21 +32,20 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 # Add compiler flags for building executables (-fPIE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-add_subdirectory(DSP)
-add_subdirectory(IO)
-add_subdirectory(MISC)
-
 # find google test
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-# Find the QtWidgets library
-find_package(Qt5Widgets)
+
+add_subdirectory(DSP)
+add_subdirectory(IO)
+add_subdirectory(MISC)
+add_subdirectory(GUI)
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r DSP IO MISC log4cplus Qt5::Widgets)
+target_link_libraries(sdr_c3r DSP IO MISC GUI log4cplus Qt5::Widgets)
 
 # for testing
 add_executable(tests tests.cxx)
