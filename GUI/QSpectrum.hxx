@@ -17,11 +17,10 @@ public:
 protected:
 	QPainter painter;
 	QTimer timer;
-    QRgb *pixels1;
-	QImage *image1;
-    QRgb *pixels2;
-	QImage *image2;
+    QRgb *pixels;
+	QImage *image;
 	void paintEvent(QPaintEvent *event);
+	void resizeEvent(QResizeEvent *event);
 
 signals:
 
@@ -30,5 +29,6 @@ public slots:
 	void changeT();
 
 private:
+	void prepare_display(QRgb *pixels);
 	/* data */
 };
