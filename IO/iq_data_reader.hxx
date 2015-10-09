@@ -4,11 +4,11 @@
 
 using namespace std;
 
-class iq_data
+class iq_data_reader
 {
 public:
-	iq_data (string fileName);
-	virtual ~iq_data ();
+	iq_data_reader(string fileName,int block_size());
+	virtual ~iq_data_reader ();
 
 private:
 	unique_ptr<ifstream> file;
