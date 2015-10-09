@@ -21,6 +21,8 @@ protected:
 	QImage *image;
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
+	void CreatePalete();
+	QRgb getColor(unsigned char val);
 
 signals:
 
@@ -29,7 +31,8 @@ public slots:
 	void changeT();
 
 private:
-	void prepare_display(QRgb *pixels);
-	void draw_line(QRgb *pixels);
+	std::array<QRgb, 255> palette;
+	void prepareDisplay(QRgb *pixels);
+	void drawLine(QRgb *pixels);
 	/* data */
 };
