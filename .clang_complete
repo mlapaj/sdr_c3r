@@ -1,3 +1,4 @@
 -I/usr/include/qt/
 -I/usr/include/qt/QtWidgets/
 -I/usr/include/qt/QtGui/
+-std=c++11

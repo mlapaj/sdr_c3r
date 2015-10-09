@@ -30,5 +30,6 @@ public slots:
 
 private:
 	void prepare_display(QRgb *pixels);
+	void draw_line(QRgb *pixels);
 	/* data */
 };
