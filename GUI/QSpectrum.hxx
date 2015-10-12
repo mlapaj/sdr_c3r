@@ -33,6 +33,6 @@ public slots:
 private:
 	std::array<QRgb, 255> palette;
 	void prepareDisplay(QRgb *pixels);
-	void drawLine(QRgb *pixels);
+	void drawLine(QRgb *pixels,vector<int> data);
 	/* data */
 };

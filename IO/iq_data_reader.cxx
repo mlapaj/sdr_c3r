@@ -9,6 +9,7 @@ iq_data_reader::iq_data_reader(string fileName, int block_size):
 
 
 int iq_data_reader::read_data(vector<complex<double>> &data){
+	data.resize(block_size);
 	vector<complex<double>> sample;
 	complex<double> cnumber;
 	unsigned char d_real,d_imag;
@@ -17,5 +18,6 @@ int iq_data_reader::read_data(vector<complex<double>> &data){
 		file->read((char *)&d_imag,sizeof(char));
 		cnumber.real((double)d_real-127.5);
 		cnumber.imag((double)d_imag-127.5);
+		data[i] = cnumber;
 	}
 }

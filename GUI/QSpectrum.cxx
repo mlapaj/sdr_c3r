@@ -2,7 +2,9 @@
 #include <iostream>
 #include <cstdlib>
 #include "QSpectrum.hxx"
-
+#include "../IO/iq_data_reader.hxx"
+#include "../DSP/fourier.hxx"
+#include <algorithm>
 using namespace std;
 void funk(QRgb *pixels);
 
@@ -45,18 +47,43 @@ QRgb QSpectrum::getColor(unsigned char val){
 	return palette.at(val);
 }
 
-void QSpectrum::drawLine(QRgb *pixels){
+
+bool abs_part ( const std::complex<double> & lhs ,
+		const std::complex<double> & rhs)
+{
+	return abs(lhs) < abs(rhs);
+}
+
+void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 	static unsigned char col = 0;
-		for (int x = 0; x < width(); ++x) {
-				pixels[x] = getColor(col);
+		for (int x = 0; x < width() && x < data.size(); ++x) {
+				pixels[x] = getColor(data[x]);
 		}
 	col++;
 	if (col>=255) col = 0;
 }
 
+fourier oFourier(1024);
+iq_data_reader iq("FMcapture1.dat",1024);
+
 void QSpectrum::paintEvent(QPaintEvent *event){
 	QTime time;
 	time.start();
+
+
+	vector<complex<double>> x;
+	vector<complex<double>> out;
+	vector<int> to_display;
+	iq.read_data(x);
+	oFourier.do_fft(x,out);
+	double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
+	for (complex<double> x: out){
+		to_display.push_back((abs(x)/maxVal) * 255);
+	//	cout << (abs(x)/maxVal) * 255 << endl;
+	}
+
+	// return 0;
+
 
 	if (dupa>=height()*2) {
 		dupa = height();
@@ -64,7 +91,7 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 		int pos_src = width() * height();
 		memcpy(&pixels[pos_dst],&pixels[pos_src],width()*height()*sizeof(QRgb));
 	}
-    drawLine(&pixels[dupa * width()]);	
+    drawLine(&pixels[dupa * width()],to_display);	
 	dupa+=1;
 	painter.begin(this);
 	painter.drawImage(0, 0, *image,0,dupa-height());
