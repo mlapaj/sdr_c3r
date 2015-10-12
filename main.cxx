@@ -14,6 +14,7 @@
 
 #include "DSP/fourier.hxx"
 #include "IO/csv.hxx"
+#include "IO/iq_data_reader.hxx"
 
 #include "GUI/QSpectrum.hxx"
 #include <QTimer>
@@ -34,6 +35,10 @@ int main(int argc,char **argv){
 	int nPoints;
 	cout << "Starting app.." << endl;
 
+    iq_data_reader iq("FMcapture1.dat",5);
+	vector<complex<double>> x;
+	iq.read_data(x);
+	return 0;
 	QApplication app(argc, argv);
 	QSpectrum spectrum;
     //QLabel hello("Hello world!");
