@@ -5,6 +5,8 @@
 #include "../IO/iq_data_reader.hxx"
 #include "../DSP/fourier.hxx"
 #include <algorithm>
+#include <cmath>
+
 using namespace std;
 void funk(QRgb *pixels);
 
@@ -14,7 +16,7 @@ QSpectrum::QSpectrum(){
 
 	prepareDisplay(pixels);
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
-	timer.start( 32 );
+	timer.start( 16 );
     CreatePalete();
 }
 
@@ -54,6 +56,7 @@ bool abs_part ( const std::complex<double> & lhs ,
 	return abs(lhs) < abs(rhs);
 }
 
+
 void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 	static unsigned char col = 0;
 		for (int x = 0; x < width() && x < data.size(); ++x) {
@@ -76,13 +79,24 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	vector<int> to_display;
 	iq.read_data(x);
 	oFourier.do_fft(x,out);
+	for (int i=0;i<10;i++){
+	iq.read_data(x);
+	}
+	
 	double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
+	int maxiVal = 0;
 	for (complex<double> x: out){
-		to_display.push_back((abs(x)/maxVal) * 255);
-	//	cout << (abs(x)/maxVal) * 255 << endl;
+        //int val = 20 * log10(abs(x)/maxVal);
+		int val = abs(20 * log10(abs(x)/maxVal)); // *254;
+//		val += 100; 
+		if (val > 254) val = 254;
+		if (abs(val)>maxiVal) maxiVal = val;
+		to_display.push_back(val);
 	}
 
-	// return 0;
+	for (int i=0;i<to_display.size();i++){
+	//	to_display[i] = abs(((float)to_display[i] / (float) maxiVal)) * 254;
+	}
 
 
 	if (dupa>=height()*2) {
