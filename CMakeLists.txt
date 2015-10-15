@@ -53,7 +53,7 @@ add_subdirectory(GUI)
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r IO MISC GUI DSP log4cplus Qt5::Widgets)
+target_link_libraries(sdr_c3r IO MISC DSP log4cplus ${SDL2_LIBRARY}) # Qt5::Widgets GUI 
 
 # for testing
 add_executable(tests tests.cxx)
