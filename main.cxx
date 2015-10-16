@@ -20,7 +20,8 @@
 #include "GUI/QSpectrum.hxx"
 #include <QTimer>
 
-
+#define D_WIDTH 1024
+#define D_HEIGHT 768
 
 
 using namespace std;
@@ -43,8 +44,8 @@ cout << "Starting app.." << endl;
     (
         "Jeu de la vie", SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        640,
-        480,
+        D_WIDTH,
+        D_HEIGHT,
         SDL_WINDOW_SHOWN
     );
  if( window == NULL )
@@ -82,8 +83,8 @@ for (int i=0;i<10;i++){
     r.h = 50;
 
     // Set render color to blue ( rect will be rendered in this color )
-    SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
-    SDL_RenderFillRect( renderer, &r );
+//    SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
+//    SDL_RenderFillRect( renderer, &r );
     // Render the rect to the screen
     SDL_RenderPresent(renderer);
 cout << "*" << endl;
@@ -91,10 +92,31 @@ cout << "*" << endl;
 }
     // Wait for 5 sec
 
+/* or using the default masks for the depth: */
+SDL_Surface *surface;
+SDL_Surface *screenSurface;
+screenSurface = SDL_GetWindowSurface(window);
+surface = SDL_CreateRGBSurface(0,D_WIDTH,D_HEIGHT,32,0,0,0,0);
+
+SDL_Rect source_rect;
+source_rect.x = 0;
+source_rect.y = 0;
+source_rect.w = D_WIDTH;
+source_rect.h = D_HEIGHT;
+
+
 int i = 1;
     while(i){
 
-    SDL_RenderPresent(renderer);
+SDL_LockSurface(surface);
+for (int i=0;i<surface->w;i++){
+	for (int j=0;j<surface->h;j++){
+		((Uint32 *)surface->pixels)[ ( j * surface->w ) + i ] = rand() % 0xFFFFFFFF; 
+	}
+}
+SDL_UnlockSurface(surface);
+		SDL_BlitSurface(surface, &source_rect, screenSurface, NULL);    
+		SDL_UpdateWindowSurface(window);
     SDL_Event event;
     while (i && SDL_PollEvent(&event)) {
          // handle your event here
@@ -107,14 +129,12 @@ break;
 
 
     }
-    SDL_RenderFillRect( renderer, &r );
-    // Render the rect to the screen
-    SDL_RenderPresent(renderer);
 
 }
 
 
     SDL_DestroyWindow(window);
+	SDL_FreeSurface(surface);
     SDL_Quit();
 
 	//QApplication app(argc, argv);
