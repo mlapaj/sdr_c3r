@@ -27,6 +27,32 @@
 using namespace std;
 using namespace log4cplus;
 
+
+
+std::array<Uint32, 255> palette;
+
+uint8_t calcCol(int i){
+	if (i<170 && i > 0)
+		return sin( (i/(float)(170)) * 180 * M_PI /  (float) 180) * 255;
+	else
+		return 0;
+}
+
+
+void CreatePalete(SDL_PixelFormat *fmt){
+	uint8_t r = 0;
+	uint8_t g = 0;
+	uint8_t b = 0;
+	for (int i=0;i<(int) palette.size();++i){
+		r = calcCol(i-170);
+		g = calcCol(i-60);
+		b = calcCol(i);
+        cout << "i " << i  << " r " << (int)r << " g " << (int)g << " b " << (int)b << endl;
+		palette[i] = SDL_MapRGB(fmt,r,g,b);
+		cout << "i: " << i << " val:" << palette[i] << " r: " << r <<" g:"<<g<<" b:"<<b;
+	}
+}
+
 int main(int argc,char **argv){
 	// log configuration
 	SharedAppenderPtr append(new FileAppender("sdr_c3r.log"));
@@ -37,114 +63,85 @@ int main(int argc,char **argv){
 	// end of log configuration
 
 	int nPoints;
-cout << "Starting app.." << endl;
+	cout << "Starting app.." << endl;
 
-	SDL_Window* window = NULL;
-    window = SDL_CreateWindow
-    (
-        "Jeu de la vie", SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        D_WIDTH,
-        D_HEIGHT,
-        SDL_WINDOW_SHOWN
-    );
- if( window == NULL )
-	 {
-		 printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
-	 }
-
-
-    // Setup renderer
-    SDL_Renderer* renderer = NULL;
-    renderer =  SDL_CreateRenderer( window, -1,  SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-    // Set render color to red ( background will be rendered in this color )
-    SDL_SetRenderDrawColor( renderer, 255, 0, 0, 255 );
-
-    // Clear winow
-    SDL_RenderClear( renderer );
-
-    // Creat a rect at pos ( 50, 50 ) that's 50 pixels wide and 50 pixels high.
-    SDL_Rect r;
-    r.x = 50;
-    r.y = 50;
-    r.w = 50;
-    r.h = 50;
-
-    // Set render color to blue ( rect will be rendered in this color )
-    SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
-
-for (int i=0;i<10;i++){
- // Creat a rect at pos ( 50, 50 ) that's 50 pixels wide and 50 pixels high.
-    SDL_Rect r;
-    r.x = 50;
-    r.y = i;
-    r.w = 50;
-    r.h = 50;
-
-    // Set render color to blue ( rect will be rendered in this color )
-//    SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
-//    SDL_RenderFillRect( renderer, &r );
-    // Render the rect to the screen
-    SDL_RenderPresent(renderer);
-cout << "*" << endl;
-    // Render rect
-}
-    // Wait for 5 sec
-
-/* or using the default masks for the depth: */
-SDL_Surface *surface;
-SDL_Surface *screenSurface;
-screenSurface = SDL_GetWindowSurface(window);
-surface = SDL_CreateRGBSurface(0,D_WIDTH,D_HEIGHT,32,0,0,0,0);
-
-SDL_Rect source_rect;
-source_rect.x = 0;
-source_rect.y = 0;
-source_rect.w = D_WIDTH;
-source_rect.h = D_HEIGHT;
-
-
-int i = 1;
-    while(i){
-
-SDL_LockSurface(surface);
-for (int i=0;i<surface->w;i++){
-	for (int j=0;j<surface->h;j++){
-		((Uint32 *)surface->pixels)[ ( j * surface->w ) + i ] = rand() % 0xFFFFFFFF; 
+	SDL_Window* window = SDL_CreateWindow
+		(
+		 "Jeu de la vie", SDL_WINDOWPOS_UNDEFINED,
+		 SDL_WINDOWPOS_UNDEFINED,
+		 D_WIDTH,
+		 D_HEIGHT,
+		 SDL_WINDOW_SHOWN
+		);
+	if( window == NULL )
+	{
+		printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
 	}
-}
-SDL_UnlockSurface(surface);
-		SDL_BlitSurface(surface, &source_rect, screenSurface, NULL);    
-		SDL_UpdateWindowSurface(window);
-    SDL_Event event;
-    while (i && SDL_PollEvent(&event)) {
-         // handle your event here
-switch( event.type ){
-      case SDL_KEYDOWN:
-        printf( "Key press detected\n" );i =0 ;
-        break;
-break;
-}
 
 
-    }
+	SDL_Renderer* renderer = SDL_CreateRenderer( window, -1,
+			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-}
+	SDL_Texture* sdlTexture = SDL_CreateTexture(renderer,
+			SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			D_WIDTH, D_HEIGHT);
+	Uint32 *myPixels = new Uint32[D_WIDTH * D_HEIGHT];
+
+   SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
+   CreatePalete(fmt);
+
+	SDL_RenderClear(renderer);
+	for (int x = 0; x < D_WIDTH;x++){
+		for (int y = 0; y < D_HEIGHT; y++)
+		{
+			myPixels[y*D_WIDTH+x] = rand() % 0xFFFFFFFF;
+		}
+	}
+	SDL_UpdateTexture(sdlTexture, NULL, myPixels, D_WIDTH * sizeof (Uint32));
+	SDL_Rect rect;
+	rect.x=0;
+	rect.y=0;
+	rect.w=D_WIDTH;
+	rect.h=1;
+
+	int i = 1;
+	int j = 0;
+	int ccol = 0;
+	while(i){
+		Uint32 *pixels;
+		int pitch;
+		j++;
+		ccol++;
+		if (j>D_HEIGHT) j = 0;
+		if (ccol > 254) ccol = 0;
+		rect.y = j;
+		SDL_LockTexture(sdlTexture, &rect ,(void **)&pixels,&pitch);
+		for (int x=0;x<D_WIDTH;x++){
+			pixels[x] = palette[ccol];
+		}
+		SDL_UnlockTexture(sdlTexture);
+		SDL_RenderCopy(renderer, sdlTexture, NULL, NULL);
+		SDL_RenderPresent(renderer);
+		SDL_Event event;
+		while (i && SDL_PollEvent(&event)) {
+			// handle your event here
+			switch( event.type ){
+				case SDL_KEYDOWN:
+					printf( "Key press detected\n" );i =0 ;
+					break;
+					break;
+			}
 
 
-    SDL_DestroyWindow(window);
-	SDL_FreeSurface(surface);
-    SDL_Quit();
+		}
+	}
 
-	//QApplication app(argc, argv);
-	//QSpectrum spectrum;
-    //QLabel hello("Hello world!");
 
-	//hello.show();
-	//spectrum.show();
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 
-    //return app.exec();
+
 
 	cout << "Ending app.." << endl;
 }
