@@ -53,6 +53,21 @@ void CreatePalete(SDL_PixelFormat *fmt){
 	}
 }
 
+void drawLine(Uint32 *pixels,vector<int> data){
+	static unsigned char col = 0;
+		for (unsigned long x = 0; x < D_WIDTH && x < data.size(); ++x) {
+				pixels[x] = palette[data[x]];
+		}
+	col++;
+	if (col>=255) col = 0;
+}
+
+bool abs_part ( const std::complex<double> & lhs ,
+		const std::complex<double> & rhs)
+{
+	return abs(lhs) < abs(rhs);
+}
+
 int main(int argc,char **argv){
 	// log configuration
 	SharedAppenderPtr append(new FileAppender("sdr_c3r.log"));
@@ -80,17 +95,17 @@ int main(int argc,char **argv){
 
 
 	SDL_Renderer* renderer = SDL_CreateRenderer( window, -1,
-			SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			SDL_RENDERER_ACCELERATED );
 
 	SDL_Texture* sdlTexture = SDL_CreateTexture(renderer,
 			SDL_PIXELFORMAT_ARGB8888,
 			SDL_TEXTUREACCESS_STREAMING,
-			D_WIDTH, D_HEIGHT);
-	Uint32 *myPixels = new Uint32[D_WIDTH * D_HEIGHT];
+			D_WIDTH, D_HEIGHT*2);
+	Uint32 *myPixels = new Uint32[D_WIDTH * D_HEIGHT*2];
 
    SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
    CreatePalete(fmt);
-
+/*
 	SDL_RenderClear(renderer);
 	for (int x = 0; x < D_WIDTH;x++){
 		for (int y = 0; y < D_HEIGHT; y++)
@@ -98,6 +113,7 @@ int main(int argc,char **argv){
 			myPixels[y*D_WIDTH+x] = rand() % 0xFFFFFFFF;
 		}
 	}
+*/
 	SDL_UpdateTexture(sdlTexture, NULL, myPixels, D_WIDTH * sizeof (Uint32));
 	SDL_Rect rect;
 	rect.x=0;
@@ -107,21 +123,62 @@ int main(int argc,char **argv){
 
 	int i = 1;
 	int j = 0;
-	int ccol = 0;
+
+
+	SDL_Rect rect2;
+	rect2.x=0;
+	rect2.y=0;
+	rect2.w=D_WIDTH;
+	rect2.h=D_HEIGHT;
+	int dupa = 0;
+
+
+	fourier oFourier(1024);
+	iq_data_reader iq("FMcapture1.dat",1024);
+	vector<complex<double>> x;
+	vector<complex<double>> out;
+	vector<int> to_display;
+
+    j=D_HEIGHT-1;
 	while(i){
+		SDL_RenderClear(renderer);
+		x.clear();
+		iq.read_data(x);
+		oFourier.do_fft(x,out);
+		for (int i=0;i<10;i++){
+			iq.read_data(x);
+		}
+
+		double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
+		int maxiVal = 0;
+
+		for (complex<double> x: out){
+			int val = (abs(x)/maxVal) * 254;
+			//int val = abs(20 * log10(abs(x)/maxVal)); // *254;
+			val *= 5; 
+			if (val > 254) val = 254;
+			if (abs(val)>maxiVal) maxiVal = val;
+			to_display.push_back(val);
+		}
+
 		Uint32 *pixels;
 		int pitch;
 		j++;
-		ccol++;
-		if (j>D_HEIGHT) j = 0;
-		if (ccol > 254) ccol = 0;
+		dupa++;
+		if (j>=D_HEIGHT*2) j = 0;
+		if (dupa>=D_HEIGHT) {
+			dupa = 0;
+		}
+		rect2.y=dupa;
+		rect2.h=D_HEIGHT;
+
 		rect.y = j;
 		SDL_LockTexture(sdlTexture, &rect ,(void **)&pixels,&pitch);
-		for (int x=0;x<D_WIDTH;x++){
-			pixels[x] = palette[ccol];
-		}
+		
+		drawLine(pixels,to_display);
+		to_display.clear();
 		SDL_UnlockTexture(sdlTexture);
-		SDL_RenderCopy(renderer, sdlTexture, NULL, NULL);
+		SDL_RenderCopy(renderer, sdlTexture, &rect2, NULL);
 		SDL_RenderPresent(renderer);
 		SDL_Event event;
 		while (i && SDL_PollEvent(&event)) {
@@ -135,6 +192,7 @@ int main(int argc,char **argv){
 
 
 		}
+		SDL_Delay(200);
 	}
 
 
