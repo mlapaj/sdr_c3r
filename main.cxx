@@ -20,8 +20,8 @@
 #include "GUI/QSpectrum.hxx"
 #include <QTimer>
 
-#define D_WIDTH 1024
-#define D_HEIGHT 768
+#define D_WIDTH 1680
+#define D_HEIGHT 1050
 
 
 using namespace std;
@@ -86,7 +86,7 @@ int main(int argc,char **argv){
 		 SDL_WINDOWPOS_UNDEFINED,
 		 D_WIDTH,
 		 D_HEIGHT,
-		 SDL_WINDOW_SHOWN
+		 SDL_WINDOW_FULLSCREEN
 		);
 	if( window == NULL )
 	{
@@ -95,7 +95,7 @@ int main(int argc,char **argv){
 
 
 	SDL_Renderer* renderer = SDL_CreateRenderer( window, -1,
-			SDL_RENDERER_ACCELERATED );
+			SDL_RENDERER_ACCELERATED);
 
 	SDL_Texture* sdlTexture = SDL_CreateTexture(renderer,
 			SDL_PIXELFORMAT_ARGB8888,
@@ -105,16 +105,8 @@ int main(int argc,char **argv){
 
    SDL_PixelFormat *fmt = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
    CreatePalete(fmt);
-/*
-	SDL_RenderClear(renderer);
-	for (int x = 0; x < D_WIDTH;x++){
-		for (int y = 0; y < D_HEIGHT; y++)
-		{
-			myPixels[y*D_WIDTH+x] = rand() % 0xFFFFFFFF;
-		}
-	}
-*/
-	SDL_UpdateTexture(sdlTexture, NULL, myPixels, D_WIDTH * sizeof (Uint32));
+	
+   SDL_UpdateTexture(sdlTexture, NULL, myPixels, D_WIDTH * sizeof (Uint32));
 	SDL_Rect rect;
 	rect.x=0;
 	rect.y=0;
@@ -140,8 +132,15 @@ int main(int argc,char **argv){
 	vector<int> to_display;
 
     j=D_HEIGHT-1;
+	int z = 0;
+	int ccol = 0;
 	while(i){
-		SDL_RenderClear(renderer);
+z++;
+if (z==30)
+{
+	ccol++;
+	if (ccol>=255) ccol = 0;
+	z=0;
 		x.clear();
 		iq.read_data(x);
 		oFourier.do_fft(x,out);
@@ -155,7 +154,7 @@ int main(int argc,char **argv){
 		for (complex<double> x: out){
 			int val = (abs(x)/maxVal) * 254;
 			//int val = abs(20 * log10(abs(x)/maxVal)); // *254;
-			val *= 5; 
+			val *= 2; 
 			if (val > 254) val = 254;
 			if (abs(val)>maxiVal) maxiVal = val;
 			to_display.push_back(val);
@@ -171,13 +170,21 @@ int main(int argc,char **argv){
 		}
 		rect2.y=dupa;
 		rect2.h=D_HEIGHT;
+		rect2.w=D_WIDTH*2;
 
 		rect.y = j;
 		SDL_LockTexture(sdlTexture, &rect ,(void **)&pixels,&pitch);
+	
+		for (unsigned long x = 0; x < D_WIDTH ; ++x) {
+				pixels[x] = palette[ccol];
+		}
 		
-		drawLine(pixels,to_display);
+		
+		//drawLine(pixels,to_display);
 		to_display.clear();
 		SDL_UnlockTexture(sdlTexture);
+}
+		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, sdlTexture, &rect2, NULL);
 		SDL_RenderPresent(renderer);
 		SDL_Event event;
@@ -192,7 +199,6 @@ int main(int argc,char **argv){
 
 
 		}
-		SDL_Delay(200);
 	}
 
 
