@@ -53,14 +53,39 @@ void CreatePalete(SDL_PixelFormat *fmt){
 	}
 }
 
+
+
+Uint32 oldPixels[D_WIDTH];
+
+
+Uint32 oldPixels[D_WIDTH];
 void drawLine(Uint32 *pixels,vector<int> data){
 	static unsigned char col = 0;
 		for (unsigned long x = 0; x < D_WIDTH && x < data.size(); ++x) {
-				pixels[x] = palette[data[x]];
+			int dupa = (data[x] + 1.7 * oldPixels[x]) / 2;
+			if (dupa>=255) dupa=254;
+				pixels[x] = palette[dupa] ;
+				oldPixels[x] = dupa;
 		}
+
 	col++;
 	if (col>=255) col = 0;
 }
+
+
+
+/*
+Uint32 oldPixels[D_WIDTH];
+void drawLine(Uint32 *pixels,vector<int> data){
+	static unsigned char col = 0;
+		for (unsigned long x = 0; x < D_WIDTH && x < data.size(); ++x) {
+				pixels[x] = palette[data[x]] ;
+		}
+
+	col++;
+	if (col>=255) col = 0;
+}
+*/
 
 bool abs_part ( const std::complex<double> & lhs ,
 		const std::complex<double> & rhs)
@@ -125,6 +150,12 @@ int main(int argc,char **argv){
 	int dupa = 0;
 
 
+	SDL_Rect rect3;
+	rect3.x=0;
+	rect3.y=0;
+	rect3.w=D_WIDTH;
+	rect3.h=D_HEIGHT;
+
 	fourier oFourier(1024);
 	iq_data_reader iq("FMcapture1.dat",1024);
 	vector<complex<double>> x;
@@ -134,6 +165,7 @@ int main(int argc,char **argv){
     j=D_HEIGHT-1;
 	int z = 0;
 	int ccol = 0;
+//SDL_RenderSetScale(renderer,10,10);
 	while(i){
 z++;
 if (z==30)
@@ -152,7 +184,7 @@ if (z==30)
 		int maxiVal = 0;
 
 		for (complex<double> x: out){
-			int val = (abs(x)/maxVal) * 254;
+			int val = (abs(x)/maxVal) * 128;
 			//int val = abs(20 * log10(abs(x)/maxVal)); // *254;
 			val *= 2; 
 			if (val > 254) val = 254;
@@ -175,17 +207,17 @@ if (z==30)
 		rect.y = j;
 		SDL_LockTexture(sdlTexture, &rect ,(void **)&pixels,&pitch);
 	
-		for (unsigned long x = 0; x < D_WIDTH ; ++x) {
-				pixels[x] = palette[ccol];
-		}
+		//for (unsigned long x = 0; x < D_WIDTH ; ++x) {
+		//		pixels[x] = palette[ccol];
+		//}
 		
 		
-		//drawLine(pixels,to_display);
+		drawLine(pixels,to_display);
 		to_display.clear();
 		SDL_UnlockTexture(sdlTexture);
 }
 		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, sdlTexture, &rect2, NULL);
+		SDL_RenderCopy(renderer, sdlTexture, &rect2, &rect3);
 		SDL_RenderPresent(renderer);
 		SDL_Event event;
 		while (i && SDL_PollEvent(&event)) {
