@@ -17,10 +17,8 @@ public:
 protected:
 	QPainter painter;
 	QTimer timer;
-	QTimer timer2;
     QRgb *pixels;
 	QImage *image;
-	QImage *image2;
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
 	void CreatePalete();
@@ -31,7 +29,6 @@ signals:
 
 public slots:
 	void changeT();
-	void drawVideo();
 
 private:
 	std::array<QRgb, 255> palette;

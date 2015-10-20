@@ -1,9 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (sdr_c3r)
 
-# includes cmake/FindSDL2.cmake
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
@@ -32,11 +29,6 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS})
 # Use the compile definitions defined in the Qt 5 Widgets module
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
-# Look up SDL2 and add the include directory to our include path
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
-
-
 # Add compiler flags for building executables (-fPIE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
@@ -53,7 +45,7 @@ add_subdirectory(GUI)
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r IO MISC DSP log4cplus ${SDL2_LIBRARY}) # Qt5::Widgets GUI 
+target_link_libraries(sdr_c3r IO MISC GUI DSP log4cplus Qt5::Widgets)
 
 # for testing
 add_executable(tests tests.cxx)
