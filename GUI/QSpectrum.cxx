@@ -4,6 +4,7 @@
 #include "QSpectrum.hxx"
 #include "../IO/iq_data_reader.hxx"
 #include "../DSP/fourier.hxx"
+#include <array>
 #include <algorithm>
 #include <cmath>
 
@@ -16,7 +17,7 @@ QSpectrum::QSpectrum(){
 
 	prepareDisplay(pixels);
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
-	timer.start( 16 );
+	timer.start( 30 );
     CreatePalete();
 }
 
@@ -56,14 +57,19 @@ bool abs_part ( const std::complex<double> & lhs ,
 	return abs(lhs) < abs(rhs);
 }
 
-
+vector<int> ppp_data(1024);
+vector<int> pp_data(1024);
+vector<int> p_data(1024);
 void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
-	static unsigned char col = 0;
 		for (int x = 0; x < width() && x < data.size(); ++x) {
-				pixels[x] = getColor(data[x]);
+			int ccol = (1*data[x] + 1 * p_data[x] + 1 *pp_data[x] + 1 * ppp_data[x])/4;
+			if (ccol>254) ccol=254;
+//			data[x] = ccol; //dirty hack
+			pixels[x] = getColor(ccol);
 		}
-	col++;
-	if (col>=255) col = 0;
+    ppp_data = pp_data;
+	pp_data = p_data;
+	p_data = data;
 }
 
 fourier oFourier(1024);
@@ -79,7 +85,8 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	vector<int> to_display;
 	iq.read_data(x);
 	oFourier.do_fft(x,out);
-	for (int i=0;i<10;i++){
+
+	for (int i=0;i<1;i++){
 	iq.read_data(x);
 	}
 	
@@ -87,9 +94,11 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	int maxiVal = 0;
 	for (complex<double> x: out){
         //int val = 20 * log10(abs(x)/maxVal);
-		int val = abs(20 * log10(abs(x)/maxVal)); // *254;
-//		val += 100; 
+		//int val = abs(20 * log10(abs(x)/maxVal)); // *254;
+		int val = (abs(x)/maxVal) *254;
+		val = (val * 2) + 50;
 		if (val > 254) val = 254;
+//		val += 100; 
 		if (abs(val)>maxiVal) maxiVal = val;
 		to_display.push_back(val);
 	}
@@ -126,7 +135,7 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	pixels = new QRgb[width()*height()*2];
 	image = new QImage((uchar*)pixels,width(),height()*2, QImage::Format_RGB32);
 	prepareDisplay(pixels);
-	timer.start(32);
+	timer.start(30);
 	// trza dorzucic locka
 	
 	QWidget::resizeEvent(event);
