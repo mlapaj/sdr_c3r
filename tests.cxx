@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "DSP/fourier.hxx"
+#include "DSP/convolution.hxx"
 #include "IO/csv.hxx"
 #include <vector>
 #include <sstream>
@@ -203,6 +204,30 @@ TEST(DSPTest, Inv_FFT) {
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i],compare[i],0.00001);
 		}
+	}
+}
+
+TEST(DSPTest, Convolution) {
+
+	int nPoints = 2;
+	for (nPoints = 2;nPoints < 1024; nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<double> data;
+		vector<double> impulse;
+		vector<double> out;
+		vector<double> compare;
+
+		stringstream ss;
+		ss << samples_dir << samples;
+		csv::read(ss.str(),data,nPoints);
+
+		ss.str("");
+		cout << ss.str() << endl;
+		csv::read(ss.str(),impulse);
+
+		convolution oConvolution(impulse);
+		cout << endl;
 	}
 }
 

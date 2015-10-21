@@ -1,3 +1,4 @@
+#pragma once
 #include <ctime>
 
 class benchmark_timer

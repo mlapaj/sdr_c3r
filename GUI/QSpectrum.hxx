@@ -1,3 +1,4 @@
+#pragma once
 #include <QtGui>
 #include <QWidget>
 #include <QObject>
