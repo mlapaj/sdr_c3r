@@ -210,7 +210,7 @@ TEST(DSPTest, Inv_FFT) {
 TEST(DSPTest, Convolution) {
 
 	int nPoints = 2;
-	for (nPoints = 2;nPoints < 1024; nPoints = nPoints*2)
+	for (nPoints = 2;nPoints < 4; nPoints = nPoints*2)
 	{
 		cout << "Testing " << nPoints << " points."<<endl;
 		vector<double> data;
@@ -223,10 +223,12 @@ TEST(DSPTest, Convolution) {
 		csv::read(ss.str(),data,nPoints);
 
 		ss.str("");
+		ss << samples_dir << "impulse";
 		cout << ss.str() << endl;
 		csv::read(ss.str(),impulse);
 
 		convolution oConvolution(impulse);
+		oConvolution.do_conv(data);
 		cout << endl;
 	}
 }
