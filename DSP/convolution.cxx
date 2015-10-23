@@ -1,7 +1,7 @@
 #include "convolution.hxx"
+#include <algorithm>
 
 convolution::convolution(vector<double> impulse):response(impulse){
-
 }
 
 
@@ -10,24 +10,34 @@ convolution::~convolution(){
 }
 
 void convolution::do_conv(vector<double> data){
+	data = {1,2,3};
+	response = {1,2,3,4};
+	for (double d: data){
+		cout << d << " " << endl;
+	}
+	cout << endl;
+	for (double d: response){
+		cout << d << " " << endl;
+	}
 	vector<double> ret(data.size()+response.size()-1);
-	int n = 0;
-	int M = response.size()/2;
-	for (int n=0;n<ret.size();n++)
-	{
-		//cout << "!";
-		for (int m=-M;m<=M;m++){
-//			cout<< m << " ";
-			int index = n - m;
-			cout << index << " ";
-			if ((index) < ( data.size()) && ((index) >= 0)){
-				ret[n] += data[index] * response[m]; 			
-				cout << "*";
+	int dataLength =data.size();
+	int retLength = ret.size();
+	int responseLength = response.size();
+	cout << "data size: " << dataLength << " response size: " << responseLength << endl;
+	for (int i=0;i<retLength;i++){
+		double val = 0;
+		for(int j=0;j<responseLength;j++)
+		{
+			if (i-j>=0 && i-j < dataLength){
+				val += data[i-j] * response[j];
 			}
 		}
-		cout << "!!!!!!!!!!!!!!!!!!!!!! n: " << n << "out: "<< ret[n] << endl<< endl;
+		cout << val << endl;
 	}
+
+
 }
+	
 
 
 
