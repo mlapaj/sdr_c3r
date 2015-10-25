@@ -2,6 +2,7 @@
 #include <algorithm>
 
 convolution::convolution(vector<double> impulse):response(impulse){
+//	reverse(response.begin(),response.end());
 }
 
 
@@ -9,9 +10,8 @@ convolution::~convolution(){
 
 }
 
-void convolution::do_conv(vector<double> data){
-	data = {1,2,3};
-	response = {1,2,3,4};
+void convolution::do_conv(vector<double> data,vector<double> &out){
+/*
 	for (double d: data){
 		cout << d << " " << endl;
 	}
@@ -19,11 +19,12 @@ void convolution::do_conv(vector<double> data){
 	for (double d: response){
 		cout << d << " " << endl;
 	}
-	vector<double> ret(data.size()+response.size()-1);
+*/
+	out.resize(data.size()+response.size()-1);
 	int dataLength =data.size();
-	int retLength = ret.size();
+	int retLength = out.size();
 	int responseLength = response.size();
-	cout << "data size: " << dataLength << " response size: " << responseLength << endl;
+	cout << "data size: " << dataLength << " response size: " << responseLength << "out size:" << retLength << endl;
 	for (int i=0;i<retLength;i++){
 		double val = 0;
 		for(int j=0;j<responseLength;j++)
@@ -32,7 +33,7 @@ void convolution::do_conv(vector<double> data){
 				val += data[i-j] * response[j];
 			}
 		}
-		cout << val << endl;
+		out[i] = val;	
 	}
 
 
@@ -41,6 +42,6 @@ void convolution::do_conv(vector<double> data){
 
 
 
-void convolution::do_fft_conv(vector<double> data){
+void convolution::do_fft_conv(vector<double> data,vector<double> &out){
 
 }

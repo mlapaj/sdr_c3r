@@ -6,8 +6,8 @@
 class convolution{
 	public:
 	convolution(vector<double> response);
-	void do_conv(vector<double> data);
-	void do_fft_conv(vector<double> data);
+	void do_conv(vector<double> data,vector<double> &out);
+	void do_fft_conv(vector<double> data,vector<double> &out);
 	~convolution();
 	private:
 	vector<double> response;
