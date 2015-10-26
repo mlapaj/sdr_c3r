@@ -7,7 +7,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
-
+#include <complex>
 using namespace std;
 void funk(QRgb *pixels);
 
@@ -75,6 +75,7 @@ void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 fourier oFourier(1024);
 iq_data_reader iq("test_data/FMcapture1.dat",1024);
 
+long probka=0;
 void QSpectrum::paintEvent(QPaintEvent *event){
 	QTime time;
 	time.start();
@@ -83,12 +84,26 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	vector<complex<double>> x;
 	vector<complex<double>> out;
 	vector<int> to_display;
-	iq.read_data(x);
-	oFourier.do_fft(x,out);
 
 	for (int i=0;i<1;i++){
 	iq.read_data(x);
+	probka=probka+x.size();
+	x.clear();
 	}
+
+
+	iq.read_data(x);
+
+	for (int ii=0;ii<x.size();ii++)
+	{
+	   x[ii] = x[ii] * exp(complex<double>(0,-2*M_PI*(double)(178000*probka)/2500000));	
+	   probka++;
+	}
+
+
+	oFourier.do_fft(x,out);
+
+    rotate(out.begin(),out.begin()+out.size()/2,out.end());
 	
 	double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
 	int maxiVal = 0;
