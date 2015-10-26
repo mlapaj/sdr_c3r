@@ -73,7 +73,7 @@ void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 }
 
 fourier oFourier(1024);
-iq_data_reader iq("FMcapture1.dat",1024);
+iq_data_reader iq("test_data/FMcapture1.dat",1024);
 
 void QSpectrum::paintEvent(QPaintEvent *event){
 	QTime time;

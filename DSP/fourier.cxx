@@ -3,6 +3,11 @@
 #include "fourier.hxx"
 #include <complex>
 #include <array>
+#include <fstream>
+#include <iterator>
+#include <sstream>
+
+
 using namespace std;
 fourier::fourier(int nPoints){
 	LOG4CPLUS_DEBUG(logger, "Starting constructor...");
@@ -14,6 +19,37 @@ fourier::fourier(int nPoints){
 	fft_w.reserve(nFFTIterations*N);
 	fft_inv_w.reserve(nFFTIterations*N);
 	calculate_fft_ifft_matrix();
+	calculate_fourier_w();
+	calculate_inv_fourier_w();
+}
+
+void fourier::calculate_fourier_w(){
+	fourier_w.reserve(nPoints*nPoints);
+	for (int k=0;k<(int) nPoints;++k){
+		for (int n=0;n<nPoints;++n){
+			fourier_w.push_back(pow(w,(-k)*n));
+		}
+	}
+/*
+	stringstream ss;
+	ss << "calculated_fourier_";
+	ss << nPoints << ".dat";
+	
+	ofstream fout(ss.str(), ios::out | ios::binary);
+    fout.write((char*)&fourier_w[0], fourier_w.size() * sizeof(complex<double>));
+	fout.close();
+*/
+}
+
+
+void fourier::calculate_inv_fourier_w(){
+	fourier_w.reserve(nPoints*nPoints);
+	for (int k=0;k<(int) nPoints;++k){
+		for (int n=0;n<nPoints;++n){
+			inv_fourier_w.push_back(pow(w,(k)*n));
+		}
+	}
+
 }
 
 void fourier::calculate_fft_ifft_matrix(){
@@ -136,7 +172,7 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
-			wsp = wsp + data.at(n) * pow(w,(-k)*n);
+			wsp = wsp + data.at(n) * fourier_w[k*nPoints+n]; // pow(w,(-k)*n);
 		}
 		out.at(k) = wsp;
 	}
@@ -151,7 +187,7 @@ void fourier::do_fourier(vector<complex<double>> data,vector<complex<double>> &o
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
-			wsp = wsp + data.at(n) * pow(w,(-k)*n);
+			wsp = wsp + data.at(n) * fourier_w[k*nPoints+n]; //  * pow(w,(-k)*n);
 		}
 		out.at(k) = wsp;
 	}
@@ -165,7 +201,7 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<double> &out){
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
-			wsp = wsp + data.at(n) * pow(w,(k)*n);
+			wsp = wsp + data.at(n) * inv_fourier_w[k*nPoints+n]; // * pow(w,(k)*n);
 		}
 		out.at(k) = abs(wsp)/nPoints;
 	}
@@ -181,7 +217,7 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<complex<double>
 	for (int k=0;k<(int) nPoints;++k){
 		complex<double> wsp = 0;
 		for (int n=0;n<nPoints;++n){
-			wsp = wsp + data.at(n) * pow(w,(k)*n);
+			wsp = wsp + data.at(n) * inv_fourier_w[k*nPoints+n]; //pow(w,(k)*n);
 		}
 		// todo 
 		out.at(k) = wsp / (double) nPoints;
