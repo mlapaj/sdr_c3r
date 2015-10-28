@@ -10,7 +10,6 @@
 
 using namespace std;
 fourier::fourier(int nPoints){
-	LOG4CPLUS_DEBUG(logger, "Starting constructor...");
 	this->nPoints = nPoints;
 	w = exp(complex<double>(0,2*M_PI/(double)nPoints));	
 	const int N = nPoints;
@@ -166,7 +165,6 @@ void fourier::calculate_fft_ifft_matrix(){
 }
 
 void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
-	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
 	for (int k=0;k<(int) nPoints;++k){
@@ -181,7 +179,6 @@ void fourier::do_fourier(vector<double> data,vector<complex<double>> &out){
 
 
 void fourier::do_fourier(vector<complex<double>> data,vector<complex<double>> &out){
-	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
 	for (int k=0;k<(int) nPoints;++k){
@@ -195,7 +192,6 @@ void fourier::do_fourier(vector<complex<double>> data,vector<complex<double>> &o
 }
 
 void fourier::do_inv_fourier(vector<complex<double>> data,vector<double> &out){
-	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
 	for (int k=0;k<(int) nPoints;++k){
@@ -211,7 +207,6 @@ void fourier::do_inv_fourier(vector<complex<double>> data,vector<double> &out){
 
 
 void fourier::do_inv_fourier(vector<complex<double>> data,vector<complex<double>> &out){
-	LOG4CPLUS_DEBUG(logger, "Doing normal fourier calculation for double");
 	complex<double> wsp = 0;
 	out.resize(nPoints);
 	for (int k=0;k<(int) nPoints;++k){

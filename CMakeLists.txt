@@ -41,14 +41,16 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_subdirectory(DSP)
 add_subdirectory(IO)
 add_subdirectory(MISC)
+add_subdirectory(RADIO)
 add_subdirectory(GUI)
+
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r IO MISC GUI DSP log4cplus Qt5::Widgets)
+target_link_libraries(sdr_c3r IO MISC GUI RADIO DSP Qt5::Widgets)
 
 # for testing
 add_executable(tests tests.cxx)
-target_link_libraries(tests DSP IO MISC ${GTEST_BOTH_LIBRARIES} pthread log4cplus)
+target_link_libraries(tests DSP IO MISC ${GTEST_BOTH_LIBRARIES} pthread)
 
 file(COPY test_data DESTINATION .)

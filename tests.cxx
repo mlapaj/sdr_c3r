@@ -263,14 +263,7 @@ TEST(DSPTest, Convolution) {
 }
 
 int main(int argc, char **argv) {
-	// log configuration
-	SharedAppenderPtr append(new FileAppender("sdr_c3r.log"));
-	auto_ptr<Layout> layout(new log4cplus::PatternLayout("%p [%d{%H:%M:%S}] [%c] - %m%n"));
-	append->setLayout(layout);
-	Logger log = Logger::getRoot();
-	log.addAppender(append);
 	
-	// end of log configuration
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }
