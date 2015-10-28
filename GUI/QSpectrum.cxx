@@ -13,7 +13,7 @@
 using namespace std;
 void funk(QRgb *pixels);
 
-QSpectrum::QSpectrum(QWidget *parrent){
+QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
 	DLOG(INFO) << "constructor started";
 	pixels = new QRgb[width()*height()*2];
 	image = new QImage((uchar*)pixels, width(), height()*2, QImage::Format_ARGB32);
@@ -80,7 +80,6 @@ iq_data_reader iq("test_data/FMcapture1.dat",1024);
 
 long probka=0;
 void QSpectrum::paintEvent(QPaintEvent *event){
-	cout << "paint" << endl;
 	QTime time;
 	time.start();
 
@@ -152,6 +151,7 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	delete pixels;
 	delete image;
 	pixels = new QRgb[width()*height()*2];
+	memset(pixels,0x00,sizeof(QRgb)*width()*height()*2);
 	image = new QImage((uchar*)pixels,width(),height()*2, QImage::Format_RGB32);
 	prepareDisplay(pixels);
 	timer.start(30);

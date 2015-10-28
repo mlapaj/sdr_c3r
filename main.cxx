@@ -29,6 +29,7 @@ int main(int argc,char **argv){
 	google::InitGoogleLogging(argv[0]);
 	int nPoints;
 	LOG(INFO) << "Starting app..";
+
 	shared_ptr<radioSignal> oSignal(new radioFileSignal("test.txt",1024));
 	unique_ptr<radio> oRadio(new radio(oSignal));
     return app.exec();
