@@ -12,17 +12,24 @@
 #include <glog/logging.h>
 using namespace std;
 void funk(QRgb *pixels);
-
+#define D_WIDTH 1024
 QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
 	DLOG(INFO) << "constructor started";
-	pixels = new QRgb[width()*height()*2];
-	image = new QImage((uchar*)pixels, width(), height()*2, QImage::Format_ARGB32);
+	pixels = new QRgb[D_WIDTH*height()*2];
+	image = new QImage((uchar*)pixels, D_WIDTH, height()*2, QImage::Format_ARGB32);
 
 	prepareDisplay(pixels);
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
 	timer.start( 30 );
     CreatePalete();
+	zeroAtCenter = false;
 }
+
+
+void QSpectrum::setZeroAtCenter(bool param){
+	zeroAtCenter = param;
+}
+
 
 int dupa;
 void QSpectrum::prepareDisplay(QRgb *pixels){
@@ -64,7 +71,7 @@ vector<int> ppp_data(1024);
 vector<int> pp_data(1024);
 vector<int> p_data(1024);
 void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
-		for (int x = 0; x < width() && x < data.size(); ++x) {
+		for (int x = 0; x < D_WIDTH && x < data.size(); ++x) {
 			int ccol = (1*data[x] + 1 * p_data[x] + 1 *pp_data[x] + 1 * ppp_data[x])/4;
 			if (ccol>254) ccol=254;
 //			data[x] = ccol; //dirty hack
@@ -106,7 +113,10 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 
 	oFourier.do_fft(x,out);
 
+	if (zeroAtCenter)
+	{
     rotate(out.begin(),out.begin()+out.size()/2,out.end());
+	}
 	
 	double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
 	int maxiVal = 0;
@@ -129,12 +139,13 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	if (dupa>=height()*2) {
 		dupa = height();
 		int pos_dst = 0;
-		int pos_src = width() * height();
-		memcpy(&pixels[pos_dst],&pixels[pos_src],width()*height()*sizeof(QRgb));
+		int pos_src = D_WIDTH * height();
+		memcpy(&pixels[pos_dst],&pixels[pos_src],D_WIDTH*height()*sizeof(QRgb));
 	}
-    drawLine(&pixels[dupa * width()],to_display);	
+    drawLine(&pixels[dupa * D_WIDTH],to_display);	
 	dupa+=1;
 	painter.begin(this);
+	painter.scale(width()/(float)1024,1);
 	painter.drawImage(0, 0, *image,0,dupa-height());
 	painter.end();
 
@@ -150,9 +161,9 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	timer.stop();
 	delete pixels;
 	delete image;
-	pixels = new QRgb[width()*height()*2];
-	memset(pixels,0x00,sizeof(QRgb)*width()*height()*2);
-	image = new QImage((uchar*)pixels,width(),height()*2, QImage::Format_RGB32);
+	pixels = new QRgb[D_WIDTH*height()*2];
+	memset(pixels,0x00,sizeof(QRgb)*D_WIDTH*height()*2);
+	image = new QImage((uchar*)pixels,D_WIDTH,height()*2, QImage::Format_RGB32);
 	prepareDisplay(pixels);
 	timer.start(30);
 	// trza dorzucic locka

@@ -12,6 +12,7 @@ class QSpectrum: public QWidget
 	Q_OBJECT
 public:
 	QSpectrum (QWidget *parent);
+	void setZeroAtCenter(bool param);
 	virtual ~QSpectrum (){
 	}
 
@@ -35,5 +36,6 @@ private:
 	std::array<QRgb, 255> palette;
 	void prepareDisplay(QRgb *pixels);
 	void drawLine(QRgb *pixels,vector<int> data);
+	bool zeroAtCenter;
 	/* data */
 };
