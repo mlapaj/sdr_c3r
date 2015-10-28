@@ -1,2 +1,2 @@
-add_library(GUI QSpectrum.cxx)
-target_link_libraries (GUI IO) 
+add_library(GUI QSpectrum.cxx mainwindow.cpp)
+target_link_libraries (GUI IO DSP) 

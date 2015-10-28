@@ -9,7 +9,7 @@ using namespace std;
 class radioFileSignal: public radioSignal{
 public:
 	radioFileSignal(string fileName,int bufferSize);
-	virtual vector<complex<double>> getSignal();
+	virtual void getSignal(vector<complex<double>> &out);
 	virtual bool isTunable();
 	virtual ~radioFileSignal ();
 

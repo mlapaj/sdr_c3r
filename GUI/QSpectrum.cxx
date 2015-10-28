@@ -8,10 +8,13 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+
+#include <glog/logging.h>
 using namespace std;
 void funk(QRgb *pixels);
 
-QSpectrum::QSpectrum(){
+QSpectrum::QSpectrum(QWidget *parrent){
+	DLOG(INFO) << "constructor started";
 	pixels = new QRgb[width()*height()*2];
 	image = new QImage((uchar*)pixels, width(), height()*2, QImage::Format_ARGB32);
 
@@ -41,7 +44,7 @@ void QSpectrum::CreatePalete(){
 		r = calcCol(i-170);
 		g = calcCol(i-60);
 		b = calcCol(i);
-        cout << "i " << i  << " r " << (int)r << " g " << (int)g << " b " << (int)b << endl;
+        //cout << "i " << i  << " r " << (int)r << " g " << (int)g << " b " << (int)b << endl;
 		palette[i] = QColor(r,g,b).rgb();
 	}
 }
@@ -77,6 +80,7 @@ iq_data_reader iq("test_data/FMcapture1.dat",1024);
 
 long probka=0;
 void QSpectrum::paintEvent(QPaintEvent *event){
+	cout << "paint" << endl;
 	QTime time;
 	time.start();
 
@@ -143,7 +147,7 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 
 void QSpectrum::resizeEvent(QResizeEvent* event)
 {
-	cout << "resize!" << endl;
+	LOG(INFO) << "got resize event";
 	timer.stop();
 	delete pixels;
 	delete image;

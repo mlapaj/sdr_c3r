@@ -5,6 +5,7 @@ project (sdr_c3r)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 
 include(CheckCXXCompilerFlag)
@@ -33,7 +34,7 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # find google test
-# add_definitions(-DNDEBUG=1) remove if debug not needed
+# add_definitions(-DNDEBUG=1) # remove if debug not needed
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})

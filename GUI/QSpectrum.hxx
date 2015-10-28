@@ -11,7 +11,7 @@ class QSpectrum: public QWidget
 {
 	Q_OBJECT
 public:
-	QSpectrum ();
+	QSpectrum (QWidget *parrent);
 	virtual ~QSpectrum (){
 	}
 
