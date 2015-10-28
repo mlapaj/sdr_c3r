@@ -1,6 +1,10 @@
+
 #include "radio.hxx"
 
-radio::radio(){
+#include <glog/logging.h>
+
+radio::radio(shared_ptr<radioSignal> signal){
+DLOG(INFO) << "created constructor";
 
 }
 

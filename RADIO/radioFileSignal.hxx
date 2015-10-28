@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include "radioSignal.hxx"
 #include "../IO/iq_data_reader.hxx"

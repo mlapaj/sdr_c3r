@@ -33,10 +33,15 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 # find google test
+# add_definitions(-DNDEBUG=1) remove if debug not needed
 enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+# find google test
+find_package (GLog REQUIRED)
 
 add_subdirectory(DSP)
 add_subdirectory(IO)
@@ -47,7 +52,7 @@ add_subdirectory(GUI)
 
 # for main program
 add_executable(sdr_c3r main.cxx)
-target_link_libraries(sdr_c3r IO MISC GUI RADIO DSP Qt5::Widgets)
+target_link_libraries(sdr_c3r IO MISC GUI RADIO DSP Qt5::Widgets ${GLOG_LIBRARIES})
 
 # for testing
 add_executable(tests tests.cxx)
