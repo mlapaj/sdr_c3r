@@ -4,6 +4,7 @@
 #include "QSpectrum.hxx"
 #include "../IO/iq_data_reader.hxx"
 #include "../DSP/fourier.hxx"
+#include <vector>
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -88,67 +89,25 @@ iq_data_reader iq("test_data/FMcapture1.dat",1024);
 long probka=0;
 void QSpectrum::paintEvent(QPaintEvent *event){
 	QTime time;
+	if (!data.empty()){
 	time.start();
-
-
-	vector<complex<double>> x;
-	vector<complex<double>> out;
-	vector<int> to_display;
-
-	for (int i=0;i<1;i++){
-	iq.read_data(x);
-	probka=probka+x.size();
-	x.clear();
-	}
-
-
-	iq.read_data(x);
-
-	for (int ii=0;ii<x.size();ii++)
-	{
-	   x[ii] = x[ii] * exp(complex<double>(0,-2*M_PI*(double)(178000*probka)/2500000));	
-	   probka++;
-	}
-
-
-	oFourier.do_fft(x,out);
-
-	if (zeroAtCenter)
-	{
-    rotate(out.begin(),out.begin()+out.size()/2,out.end());
-	}
-	
-	double maxVal = abs(*(max_element(out.begin(),out.end(),abs_part)));
-	int maxiVal = 0;
-	for (complex<double> x: out){
-        //int val = 20 * log10(abs(x)/maxVal);
-		//int val = abs(20 * log10(abs(x)/maxVal)); // *254;
-		int val = (abs(x)/maxVal) *254;
-		val = (val * 2) + 50;
-		if (val > 254) val = 254;
-//		val += 100; 
-		if (abs(val)>maxiVal) maxiVal = val;
-		to_display.push_back(val);
-	}
-
-	for (int i=0;i<to_display.size();i++){
-	//	to_display[i] = abs(((float)to_display[i] / (float) maxiVal)) * 254;
-	}
-
-
 	if (dupa>=height()*2) {
 		dupa = height();
 		int pos_dst = 0;
 		int pos_src = D_WIDTH * height();
 		memcpy(&pixels[pos_dst],&pixels[pos_src],D_WIDTH*height()*sizeof(QRgb));
 	}
-    drawLine(&pixels[dupa * D_WIDTH],to_display);	
+    drawLine(&pixels[dupa * D_WIDTH],data.front());	
+	dataMutex.lock();
+	data.pop_front();
+	dataMutex.unlock();
 	dupa+=1;
+	}
 	painter.begin(this);
 	painter.scale(width()/(float)1024,1);
 	painter.drawImage(0, 0, *image,0,dupa-height());
 	painter.end();
-
+	
 	if (!( dupa % 100))
 	qDebug() << "drawImage time:" << time.elapsed() / (float) 1000 << " seconds.";
 
@@ -173,4 +132,32 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 
 void QSpectrum::changeT(){
 	update();
+}
+
+
+
+void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
+	vector<int> preparedData;
+	preparedData.reserve(spectrumData.size());
+
+
+	double maxVal = abs(*(max_element(spectrumData.begin(),spectrumData.end(),abs_part)));
+	int maxiVal = 0;
+	for (complex<double> x: spectrumData){
+		int val = (abs(x)/maxVal) *254;
+		val = (val * 2) + 50;
+		if (val > 254) val = 254;
+		if (abs(val)>maxiVal) maxiVal = val;
+		preparedData.push_back(val);
+	}
+
+	if (zeroAtCenter)
+	{
+		rotate(preparedData.begin(),preparedData.begin()+preparedData.size()/2,preparedData.end());
+	}
+
+	dataMutex.lock();
+	data.push_back(preparedData);
+	dataMutex.unlock();
+	// update();
 }

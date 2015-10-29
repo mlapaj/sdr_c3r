@@ -10,6 +10,8 @@ class radioFileSignal: public radioSignal{
 public:
 	radioFileSignal(string fileName,int bufferSize);
 	virtual void getSignal(vector<complex<double>> &out);
+	virtual long getSamplingRate();
+	virtual long getSignalFrequency();
 	virtual bool isTunable();
 	virtual ~radioFileSignal ();
 

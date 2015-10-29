@@ -2,6 +2,7 @@
 #include "QSpectrum.hxx"
 #include "ui_mainwindow.h"
 #include <iostream>
+
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,6 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateSpectrum(vector<complex<double>> spectrum){
+	ui->qspectrum->addSpectrumData(spectrum);
 }
 
 void MainWindow::handleCheckbox(){

@@ -3,6 +3,9 @@
 #include <QWidget>
 #include <QObject>
 #include <memory>
+#include <vector>
+#include <complex>
+using namespace std;
 // http://www.kuqin.com/qtdocument/designer-manual-6.html
 
 using namespace std;
@@ -13,6 +16,7 @@ class QSpectrum: public QWidget
 public:
 	QSpectrum (QWidget *parent);
 	void setZeroAtCenter(bool param);
+	void addSpectrumData(vector<complex<double>> spectrumData);
 	virtual ~QSpectrum (){
 	}
 
@@ -25,6 +29,8 @@ protected:
 	void resizeEvent(QResizeEvent *event);
 	void CreatePalete();
 	QRgb getColor(unsigned char val);
+	list<vector<int>> data;
+	QMutex dataMutex;
 
 signals:
 

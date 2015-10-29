@@ -1,18 +1,33 @@
 #include <memory>
+#include "../DSP/fourier.hxx"
 #include "radioSignal.hxx"
 #include "../GUI/mainwindow.h"
-class radio
+#include <QtCore>
+#include <iostream>
+class radio: public QThread
 {
 	public:
 		radio (shared_ptr<radioSignal> signal);
-		void processRadio();
 		virtual ~radio ();
 	private:
-		long fs = 2500000; // radio sampling rate
-		long frequency;
+		void run(){
+			processRadio();
+		}
+		void processRadio();
+		long signalSamplingRate = 0; // radio sampling rate
+		long signalFrequency = 0;
+		long maxTuneOffset = 0;
+		long maxFrequency = 0;
+		long minFrequency = 0;
+		void calculateFrequencyValues();
+		long currentFrequency = 0;
+		long sinePhase = 0;
+		long maxSinePhase = 0;
 
 		// radio object
 		shared_ptr<radioSignal> signal;
-		shared_ptr<MainWindow> oMainWindow;
+		shared_ptr<MainWindow> mainWindow;
+		shared_ptr<fourier> oFourier;
+		
 		
 };

@@ -30,9 +30,10 @@ int main(int argc,char **argv){
 	int nPoints;
 	LOG(INFO) << "Starting app..";
 
-	shared_ptr<radioSignal> oSignal(new radioFileSignal("test.txt",1024));
+	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",1024));
 	unique_ptr<radio> oRadio(new radio(oSignal));
-    return app.exec();
+    oRadio->start();	
+	return app.exec();
 
 	DLOG(INFO) << "Ending app..";
 }

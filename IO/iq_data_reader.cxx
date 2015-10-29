@@ -1,10 +1,10 @@
-
+#include "glog/logging.h"
 #include "iq_data_reader.hxx"
 
 iq_data_reader::iq_data_reader(string fileName, int block_size):
 	file(new ifstream(fileName,ifstream::binary)),block_size(block_size)
 {
-
+	DLOG(INFO) << "constructor";
 }
 
 
@@ -20,4 +20,8 @@ int iq_data_reader::read_data(vector<complex<double>> &data){
 		cnumber.imag((double)d_imag-127.5);
 		data[i] = cnumber;
 	}
+}
+
+iq_data_reader::~iq_data_reader(){
+	DLOG(INFO) << "dectructor";
 }

@@ -6,7 +6,7 @@
 
 
 radioFileSignal::radioFileSignal(string fileName,int bufferSize):
-	iq(new iq_data_reader("test_data/FMcapture1.dat",bufferSize)){
+	iq(new iq_data_reader(fileName,bufferSize)){
 		DLOG(INFO) << "created object";
 }
 
@@ -20,4 +20,15 @@ bool radioFileSignal::isTunable() {
 }
 
 radioFileSignal::~radioFileSignal(){
+	DLOG(INFO) << "dectructor";
+}
+	
+long radioFileSignal::getSamplingRate(){	
+	// temporary hardcoded
+	return 2500000;
+}
+
+long radioFileSignal::getSignalFrequency(){
+	// temporary hardcoded
+	return 100122000;
 }
