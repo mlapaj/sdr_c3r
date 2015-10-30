@@ -20,6 +20,23 @@ vector<double> filter::fir_lowpass(int length,long fs,long cutoff){
 	return w;
 }
 
+vector<double> filter::fir_lowpass(int length, double normalized_cutoff){
+	int M = length -1;
+	double ft = normalized_cutoff;
+	vector<double> w;
+	vector<double> window = filter::hamming(length);
+	w.resize(length);
+	for (int n=0;n<length;n++){
+		if (n==M/2){
+			w[n] = 2 * ft;
+		}else{
+			w[n] = sin(2.0*M_PI*ft*(n-M/2.0))/(M_PI*(n-M/2.0));
+		}
+		w[n] *= window[n];
+	}
+	return w;
+}
+
 vector<double> filter::hamming(int length){
 	vector<double> w;
 	w.resize(length);
