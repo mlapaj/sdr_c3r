@@ -24,7 +24,6 @@ void convolution::do_conv(vector<double> data,vector<double> &out){
 	int dataLength =data.size();
 	int retLength = out.size();
 	int responseLength = response.size();
-	cout << "data size: " << dataLength << " response size: " << responseLength << "out size:" << retLength << endl;
 	for (int i=0;i<retLength;i++){
 		double val = 0;
 		for(int j=0;j<responseLength;j++)
@@ -42,6 +41,25 @@ void convolution::do_conv(vector<double> data,vector<double> &out){
 
 
 
+void convolution::do_conv(vector<complex<double>> data,vector<complex<double>> &out){
+
+	out.resize(data.size()+response.size()-1);
+	int dataLength =data.size();
+	int retLength = out.size();
+	int responseLength = response.size();
+	for (int i=0;i<retLength;i++){
+		complex<double> val = 0;
+		for(int j=0;j<responseLength;j++)
+		{
+			if (i-j>=0 && i-j < dataLength){
+				val += data[i-j] * response[j];
+			}
+		}
+		out[i] = val;	
+	}
+
+
+}
 void convolution::do_fft_conv(vector<double> data,vector<double> &out){
 
 }

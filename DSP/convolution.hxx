@@ -7,6 +7,7 @@ class convolution{
 	public:
 	convolution(vector<double> response);
 	void do_conv(vector<double> data,vector<double> &out);
+	void do_conv(vector<complex<double>> data,vector<complex<double>> &out);
 	void do_fft_conv(vector<double> data,vector<double> &out);
 	~convolution();
 	private:

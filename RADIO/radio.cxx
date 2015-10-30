@@ -29,21 +29,37 @@ radio::~radio(){
 
 }
 
-
 void radio::processRadio(){
+	vector<double> filter_10Khz = filter::fir_lowpass(40,signalSamplingRate,10000);
+	convolution conv_filter_10Khz(filter_10Khz);
 	vector<complex<double>> signalInput;
+	vector<complex<double>> signalInputAfterConvolution;
+	vector<complex<double>> signalInputAfterDecimation;
 	vector<complex<double>> signalSpectrum;
 	vector<int> to_display;
 	bool quit = false;
 	int i = 0;
 	while(!quit){
-		signal->getSignal(signalInput);
-
-		// tune frequency
-		for (auto iter = signalInput.begin();iter!=signalInput.end();++iter)
+		signalInputAfterDecimation.clear();
+		signalInputAfterDecimation.reserve(1024);
+		while(signalInputAfterDecimation.size()<1024)
 		{
-			(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000*sinePhase)/signalFrequency));	
 
+			signal->getSignal(signalInput);
+			conv_filter_10Khz.do_conv(signalInput,signalInputAfterConvolution);
+			int step = 10;
+			for (int i=0;i<signalInputAfterConvolution.size();i+=step){
+				signalInputAfterDecimation.push_back(signalInputAfterConvolution[i]);
+			}
+
+		}
+		// tune frequency
+		
+		for (auto iter = signalInputAfterDecimation.begin();iter!=signalInputAfterDecimation.end();++iter)
+		{
+			(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000*sinePhase)/signalSamplingRate));	
+			sinePhase+=1;
+/*
 			if (sinePhase<maxSinePhase){
 				sinePhase+=1;
 			}
@@ -51,12 +67,13 @@ void radio::processRadio(){
 			{
 				sinePhase = 0;
 			}
+*/
 		}
 		i++;
 		//if (i>100){
 		//	quit = true;
 		//}
-		oFourier->do_fft(signalInput,signalSpectrum);
+		oFourier->do_fft(signalInputAfterDecimation,signalSpectrum);
 		mainWindow->updateSpectrum(signalSpectrum);
 		QThread::msleep(30);
 	}

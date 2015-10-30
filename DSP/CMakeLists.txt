@@ -1,1 +1,1 @@
-add_library(DSP fourier.cxx convolution.cxx)
+add_library(DSP fourier.cxx convolution.cxx filter.cxx)

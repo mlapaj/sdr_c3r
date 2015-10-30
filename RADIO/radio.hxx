@@ -1,9 +1,13 @@
 #include <memory>
-#include "../DSP/fourier.hxx"
+#include <iostream>
+
 #include "radioSignal.hxx"
 #include "../GUI/mainwindow.h"
+#include "../DSP/fourier.hxx"
+#include "../DSP/filter.hxx"
+#include "../DSP/convolution.hxx"
+
 #include <QtCore>
-#include <iostream>
 class radio: public QThread
 {
 	public:
