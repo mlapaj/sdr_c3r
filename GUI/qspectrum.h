@@ -1,1 +1,1 @@
-/home/cod3r/data/sdr_c3r/GUI/QSpectrum.hxx
+QSpectrum.hxx
