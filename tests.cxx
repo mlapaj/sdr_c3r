@@ -244,9 +244,8 @@ TEST(DSPTest, Convolution) {
 		cout << ss.str() << endl;
 		csv::read(ss.str(),impulse);
 
-		convolution oConvolution(impulse);
 		benchmark_timer t;
-		oConvolution.do_conv(data,out);
+		convolution::do_conv(data,impulse,out);
 		t.print();
 		cout << endl;
 
@@ -262,6 +261,55 @@ TEST(DSPTest, Convolution) {
 	}
 }
 
+TEST(DSPTest, Convolution_Segment) {
+
+	int nPoints = 256;
+	for (nPoints = 256;nPoints <= 8192; nPoints = nPoints*2)
+	{
+		cout << "Testing " << nPoints << " points."<<endl;
+		vector<double> data;
+		vector<double> impulse;
+		vector<double> out;
+		vector<double> compare;
+
+		stringstream ss;
+		ss << samples_dir << samples;
+		csv::read(ss.str(),data,nPoints);
+
+		ss.str("");
+		ss << samples_dir << "impulse";
+		cout << ss.str() << endl;
+		csv::read(ss.str(),impulse);
+
+		benchmark_timer t;
+		int j = 0;
+		vector<double> overlap;
+		vector<double> out_final;
+		while (j<data.size()){
+			vector<double> data_segment;		
+			for (int i=0;i<128 && j < data.size();++i){
+				data_segment.push_back(data[j++]);
+			}
+			convolution::do_segment_conv(overlap,data_segment,impulse,out);
+			out_final.insert(out_final.end(),out.begin(),out.end());
+		}
+		out_final.insert(out_final.end(),overlap.begin(),overlap.end());
+
+		t.print();
+		cout << endl;
+
+		ss.str("");
+		ss << samples_dir << "conv_" << nPoints;
+		csv::read(ss.str(),compare);
+
+		EXPECT_EQ(out_final.size(), compare.size());
+		for (int i=0;i<compare.size();i++){
+			EXPECT_NEAR(out_final[i],compare[i],0.00001);
+		}
+		cout << "Done testing " << nPoints << " points."<<endl;
+
+	}
+}
 int main(int argc, char **argv) {
 	
 	::testing::InitGoogleTest( &argc, argv );

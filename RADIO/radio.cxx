@@ -31,7 +31,6 @@ radio::~radio(){
 
 void radio::processRadio(){
 	vector<double> filter_10Khz = filter::fir_lowpass(40,signalSamplingRate,10000);
-	convolution conv_filter_10Khz(filter_10Khz);
 	vector<complex<double>> signalInput;
 	vector<complex<double>> signalInputAfterConvolution;
 	vector<complex<double>> signalInputAfterDecimation;
@@ -46,7 +45,7 @@ void radio::processRadio(){
 		{
 
 			signal->getSignal(signalInput);
-			conv_filter_10Khz.do_conv(signalInput,signalInputAfterConvolution);
+			convolution::do_conv(signalInput,filter_10Khz,signalInputAfterConvolution);
 			int step = 10;
 			for (int i=0;i<signalInputAfterConvolution.size();i+=step){
 				signalInputAfterDecimation.push_back(signalInputAfterConvolution[i]);
