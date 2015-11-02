@@ -9,6 +9,8 @@ iq_data_reader::iq_data_reader(string fileName, int block_size):
 
 
 int iq_data_reader::read_data(vector<complex<double>> &data){
+	data.clear();
+	if (file->eof()) return 0;
 	data.resize(block_size);
 	vector<complex<double>> sample;
 	complex<double> cnumber;

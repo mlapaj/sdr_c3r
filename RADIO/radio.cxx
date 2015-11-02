@@ -2,7 +2,7 @@
 #include <iostream>
 #include <glog/logging.h>
 #include <QThread>
-
+#include "../DSP/decimate.hxx"
 using namespace std;
 
 radio::radio(shared_ptr<radioSignal> signal)
@@ -30,50 +30,46 @@ radio::~radio(){
 }
 
 void radio::processRadio(){
-	vector<double> filter_10Khz = filter::fir_lowpass(40,signalSamplingRate,10000);
-	vector<complex<double>> signalInput;
-	vector<complex<double>> signalInputAfterConvolution;
-	vector<complex<double>> signalInputAfterDecimation;
+	vector<complex<double>> signalDecimated;
 	vector<complex<double>> signalSpectrum;
-	vector<int> to_display;
+	vector<complex<double>> signalAfterDecimation;
+	signalSpectrum.reserve(1024);
+	signalAfterDecimation.reserve(1024);
 	bool quit = false;
-	int i = 0;
-	while(!quit){
-		signalInputAfterDecimation.clear();
-		signalInputAfterDecimation.reserve(1024);
-		while(signalInputAfterDecimation.size()<1024)
-		{
-
-			signal->getSignal(signalInput);
-			convolution::do_conv(signalInput,filter_10Khz,signalInputAfterConvolution);
-			int step = 10;
-			for (int i=0;i<signalInputAfterConvolution.size();i+=step){
-				signalInputAfterDecimation.push_back(signalInputAfterConvolution[i]);
-			}
-
-		}
-		// tune frequency
-		
-		for (auto iter = signalInputAfterDecimation.begin();iter!=signalInputAfterDecimation.end();++iter)
-		{
-			(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000*sinePhase)/signalSamplingRate));	
-			sinePhase+=1;
+	while(!quit)
+	{
+		vector<complex<double>> signalInput;
+		decimate::segment_decimate<complex<double>> oDecimate(8);
+		signalDecimated.reserve(1024);
 /*
-			if (sinePhase<maxSinePhase){
-				sinePhase+=1;
-			}
-			else
-			{
-				sinePhase = 0;
-			}
-*/
+		for (int i=0;i<500;i++){
+			signal->getSignal(signalInput);
 		}
-		i++;
-		//if (i>100){
-		//	quit = true;
-		//}
-		oFourier->do_fft(signalInputAfterDecimation,signalSpectrum);
+*/
+		while (signalDecimated.size() < 1024){
+			signalInput.clear();
+			signal->getSignal(signalInput);
+			signalInput.resize(1024);
+			bool pusty = true;
+
+			for (auto iter = signalInput.begin();iter!=signalInput.end();++iter)
+			{
+				(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000*sinePhase)/signalSamplingRate));	
+				sinePhase+=1; // todo:  add max phase value
+			}
+			
+			oDecimate.decimate(signalInput,signalAfterDecimation);
+			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
+		}
+
+		oFourier->do_fft(signalDecimated,signalSpectrum);
+		
 		mainWindow->updateSpectrum(signalSpectrum);
+		signalDecimated.clear();
+		signalSpectrum.clear();
+		signalAfterDecimation.clear();
 		QThread::msleep(30);
 	}
+
+		
 }

@@ -9,6 +9,7 @@
 #include <qlabel.h>
 #include <QTimer>
 
+#include "DSP/filter.hxx"
 #include "DSP/fourier.hxx"
 #include "IO/csv.hxx"
 #include "IO/iq_data_reader.hxx"
@@ -25,6 +26,11 @@
 using namespace std;
 
 int main(int argc,char **argv){
+//	vector<double> filter_coeff = filter::fir_lowpass(21,1/(double)16);
+//	csv::save("filtr",filter_coeff,filter_coeff.size());
+
+	
+
 	QApplication app(argc, argv);
 	google::InitGoogleLogging(argv[0]);
 	int nPoints;
