@@ -37,10 +37,16 @@ void radio::processRadio(){
 	signalSpectrum.reserve(1024);
 	signalAfterDecimation.reserve(1024);
 	bool quit = false;
+	vector<double> bid_overlap;
+	vector<double> brd_overlap;
+
+	vector<double> fmSignal;
+	decimate::segment_decimate<complex<double>> oDecimate(8);
+	decimate::segment_decimate<double> oDemodulatedDecimate(10);
+
 	while(!quit)
 	{
 		vector<complex<double>> signalInput;
-		decimate::segment_decimate<complex<double>> oDecimate(8);
 		signalDecimated.reserve(1024);
 /*
 		for (int i=0;i<500;i++){
@@ -63,17 +69,53 @@ void radio::processRadio(){
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 		}
 		vector<double> demodulatedSignal;
-		for (complex<double> sample: signalDecimated)
-		{
-			vector<double> b;
-			csv::read("test_data/firls.txt",b);
-			complex<double> d = sample / abs(sample);
-			double rd = d.real();
-			double id = d.imag();
-			//double demodulated = (rd)
+		vector<double> rd;
+		rd.resize(signalDecimated.size());
+		vector<double> id;
+		id.resize(signalDecimated.size());
+
+		for (int i=0;i<signalDecimated.size();++i){
+			complex<double> val = signalDecimated[i] / abs(signalDecimated[i]);
+			rd[i] = val.real();
+			id[i] = val.imag();
 		}
-		oFourier->do_fft(signalDecimated,signalSpectrum);
+
+
+		vector<double> b;
 		
+		csv::read("test_data/firls.txt",b);
+
+		vector<double> bid;
+		convolution::do_segment_conv(bid_overlap,id,b,bid);
+		
+		vector<double> down;
+		down.resize(bid.size());
+		vector<double> demodulated;
+
+		demodulated.resize(bid.size());
+		
+		vector<double> brd;
+		convolution::do_segment_conv(brd_overlap,rd,b,brd);
+
+		for (int i=0;i<bid.size();i++){
+			brd[i] = id[i] * brd[i];
+
+			bid[i] = rd[i] * bid[i];
+
+			down[i] = (rd[i] * rd[i]) + (id[i] * id[i]);
+			demodulated[i] = (bid[i] - brd[i]) / down[i];
+		}
+
+
+		vector<double> afterFMdecimate;
+		oDemodulatedDecimate.decimate(demodulated,afterFMdecimate);
+
+		fmSignal.insert(fmSignal.end(),afterFMdecimate.begin(),afterFMdecimate.end());
+		cout << fmSignal.size() << endl;
+	    if (fmSignal.size() < 1024) continue;
+		oFourier->do_fft(fmSignal,signalSpectrum);
+		fmSignal.erase(fmSignal.begin(), fmSignal.begin() + 1024);
+		//fmSignal.clear();
 		mainWindow->updateSpectrum(signalSpectrum);
 		signalDecimated.clear();
 		signalSpectrum.clear();
