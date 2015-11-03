@@ -3,6 +3,7 @@
 #include <glog/logging.h>
 #include <QThread>
 #include "../DSP/decimate.hxx"
+#include "../IO/csv.hxx"
 using namespace std;
 
 radio::radio(shared_ptr<radioSignal> signal)
@@ -61,7 +62,16 @@ void radio::processRadio(){
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 		}
-
+		vector<double> demodulatedSignal;
+		for (complex<double> sample: signalDecimated)
+		{
+			vector<double> b;
+			csv::read("test_data/firls.txt",b);
+			complex<double> d = sample / abs(sample);
+			double rd = d.real();
+			double id = d.imag();
+			//double demodulated = (rd)
+		}
 		oFourier->do_fft(signalDecimated,signalSpectrum);
 		
 		mainWindow->updateSpectrum(signalSpectrum);
