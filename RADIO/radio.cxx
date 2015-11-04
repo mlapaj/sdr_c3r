@@ -40,6 +40,7 @@ void radio::processRadio(){
 	vector<double> bid_overlap;
 	vector<double> brd_overlap;
 
+	vector<double> beforeDecimation;
 	vector<double> fmSignal;
 	decimate::segment_decimate<complex<double>> oDecimate(8);
 	decimate::segment_decimate<double> oDemodulatedDecimate(10);
@@ -81,8 +82,7 @@ void radio::processRadio(){
 		}
 
 
-		vector<double> b;
-		
+		vector<double> b;		
 		csv::read("test_data/firls.txt",b);
 
 		vector<double> bid;
@@ -106,21 +106,28 @@ void radio::processRadio(){
 			demodulated[i] = (bid[i] - brd[i]) / down[i];
 		}
 
+		beforeDecimation.insert(beforeDecimation.begin(),demodulated.begin(),demodulated.end());
+		if (beforeDecimation.size() > 10240){
+	    vector<double> dataForDecimation;
+		dataForDecimation.insert(dataForDecimation.begin(),beforeDecimation.begin(),beforeDecimation.begin() + 10240);
+		cout << "beforeDecimation " << beforeDecimation.size() << endl;
+		beforeDecimation.erase(beforeDecimation.begin(),beforeDecimation.begin() + 10240);
+		cout << "beforeDecimation " << beforeDecimation.size() << endl;
 
+		cout << "!";
+
+		cout << "data for decim" << dataForDecimation.size() << endl;
+		
 		vector<double> afterFMdecimate;
-		oDemodulatedDecimate.decimate(demodulated,afterFMdecimate);
-
-		fmSignal.insert(fmSignal.end(),afterFMdecimate.begin(),afterFMdecimate.end());
-		cout << fmSignal.size() << endl;
-	    if (fmSignal.size() < 1024) continue;
-		oFourier->do_fft(fmSignal,signalSpectrum);
-		fmSignal.erase(fmSignal.begin(), fmSignal.begin() + 1024);
-		//fmSignal.clear();
+		oDemodulatedDecimate.decimate(dataForDecimation,afterFMdecimate);
+		cout << "decimated size" << afterFMdecimate.size() << endl;
+		oFourier->do_fft(afterFMdecimate,signalSpectrum);
 		mainWindow->updateSpectrum(signalSpectrum);
+		}
 		signalDecimated.clear();
 		signalSpectrum.clear();
 		signalAfterDecimation.clear();
-		QThread::msleep(30);
+		
 	}
 
 		

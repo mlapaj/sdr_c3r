@@ -9,6 +9,7 @@ using namespace std;
 
 namespace decimate{
 	void decimate(vector<complex<double>> in,vector<complex<double>> &out, int factor);
+
 	template<typename T>
 	class segment_decimate{
 		public:
