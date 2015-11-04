@@ -1,5 +1,6 @@
 #include "radio.hxx"
 #include <iostream>
+#include <fstream>
 #include <glog/logging.h>
 #include <QThread>
 #include "../DSP/decimate.hxx"
@@ -44,6 +45,9 @@ void radio::processRadio(){
 	vector<double> fmSignal;
 	decimate::segment_decimate<complex<double>> oDecimate(8);
 	decimate::segment_decimate<double> oDemodulatedDecimate(10);
+	
+	vector<double> b;		
+	csv::read("test_data/firls.txt",b);
 
 	while(!quit)
 	{
@@ -69,12 +73,16 @@ void radio::processRadio(){
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 		}
+
+
+
 		vector<double> demodulatedSignal;
 		vector<double> rd;
 		rd.resize(signalDecimated.size());
 		vector<double> id;
 		id.resize(signalDecimated.size());
 
+		cout << "signal decimated" << signalDecimated.size() << endl;
 		for (int i=0;i<signalDecimated.size();++i){
 			complex<double> val = signalDecimated[i] / abs(signalDecimated[i]);
 			rd[i] = val.real();
@@ -82,8 +90,6 @@ void radio::processRadio(){
 		}
 
 
-		vector<double> b;		
-		csv::read("test_data/firls.txt",b);
 
 		vector<double> bid;
 		convolution::do_segment_conv(bid_overlap,id,b,bid);
@@ -106,20 +112,29 @@ void radio::processRadio(){
 			demodulated[i] = (bid[i] - brd[i]) / down[i];
 		}
 
-		beforeDecimation.insert(beforeDecimation.begin(),demodulated.begin(),demodulated.end());
+		beforeDecimation.insert(beforeDecimation.end(),demodulated.begin(),demodulated.end());
 		if (beforeDecimation.size() > 10240){
 	    vector<double> dataForDecimation;
-		dataForDecimation.insert(dataForDecimation.begin(),beforeDecimation.begin(),beforeDecimation.begin() + 10240);
-		cout << "beforeDecimation " << beforeDecimation.size() << endl;
+		dataForDecimation.insert(dataForDecimation.end(),beforeDecimation.begin(),beforeDecimation.begin() + 10240);
 		beforeDecimation.erase(beforeDecimation.begin(),beforeDecimation.begin() + 10240);
-		cout << "beforeDecimation " << beforeDecimation.size() << endl;
 
-		cout << "!";
-
-		cout << "data for decim" << dataForDecimation.size() << endl;
 		
 		vector<double> afterFMdecimate;
 		oDemodulatedDecimate.decimate(dataForDecimation,afterFMdecimate);
+
+		ofstream data_file;      // pay attention here! ofstream
+		data_file.open("data.bin", ios::in | ios::out | ios::binary);
+		data_file.seekp(0, ios::end); 
+
+		size_t size = afterFMdecimate.size();
+
+		for (int i = 0; i < size; ++i)
+		{
+				data_file.write(reinterpret_cast<char*>(&afterFMdecimate[i]), sizeof(double));
+		}
+
+		data_file.close();
+
 		cout << "decimated size" << afterFMdecimate.size() << endl;
 		oFourier->do_fft(afterFMdecimate,signalSpectrum);
 		mainWindow->updateSpectrum(signalSpectrum);
