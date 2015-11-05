@@ -61,18 +61,23 @@ void radio::processRadio(){
 		while (signalDecimated.size() < 1024){
 			signalInput.clear();
 			signal->getSignal(signalInput);
-			signalInput.resize(1024);
+			// signalInput.resize(1024);
 			bool pusty = true;
 
 			for (auto iter = signalInput.begin();iter!=signalInput.end();++iter)
 			{
-				(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000*sinePhase)/signalSamplingRate));	
+				(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000)*double(sinePhase)/signalSamplingRate));	
 				sinePhase+=1; // todo:  add max phase value
 			}
 			
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 		}
+
+//		csv::save("shifted",signalDecimated,16250);
+//		cout << "done" << endl;
+
+//		return;
 
 
 
@@ -91,9 +96,16 @@ void radio::processRadio(){
 
 
 
+		vector<double> bid_tmp;
 		vector<double> bid;
-		convolution::do_segment_conv(bid_overlap,id,b,bid);
-		
+		convolution::do_segment_conv(bid_overlap,id,b,bid_tmp);
+		int toDel = abs((bid_tmp.size() + bid_overlap.size()) - id.size());
+		cout << "to del:" << toDel << endl;
+		//return;
+		bid.insert(bid.end(),bid_tmp.begin(),bid_tmp.end());
+		bid.insert(bid.end(),bid_overlap.begin(),bid_overlap.end());
+	    bid.erase(bid.begin(),bid.begin()+(toDel/2)+1);
+		bid.erase(bid.end()-(toDel/2),bid.end());
 		vector<double> down;
 		down.resize(bid.size());
 		vector<double> demodulated;
@@ -101,7 +113,13 @@ void radio::processRadio(){
 		demodulated.resize(bid.size());
 		
 		vector<double> brd;
-		convolution::do_segment_conv(brd_overlap,rd,b,brd);
+		vector<double> brd_tmp;
+		convolution::do_segment_conv(brd_overlap,rd,b,brd_tmp);
+		toDel = (brd_tmp.size() + brd_overlap.size()) - rd.size();
+		brd.insert(brd.end(),brd_tmp.begin(),brd_tmp.end());
+		brd.insert(brd.end(),brd_overlap.begin(),brd_overlap.end());
+	    brd.erase(brd.begin(),brd.begin()+(toDel/2)+1);
+		brd.erase(brd.end()-(toDel/2),brd.end());
 
 		for (int i=0;i<bid.size();i++){
 			brd[i] = id[i] * brd[i];

@@ -53,6 +53,23 @@ int csv::save(string filename,vector<double> &array,int howMany){
 }
 
 
+int csv::save(string filename,vector<complex<double>> &array,int howMany){
+	ofstream file(filename);
+	if (file.is_open()){
+			int count = 0;
+			while (count < array.size()){
+				double real = array[count].real();
+				double imag = array[count].imag();
+
+				char c = ',';
+				file << real;
+				file << showpos << imag << "i";
+				if ((howMany > 0) && (++count >= howMany)) break;
+				file << c;
+			}
+	}
+	return 0;
+}
 
 int csv::read(string filename,vector<complex<double>> &array,int howMany){
 	ifstream file(filename);

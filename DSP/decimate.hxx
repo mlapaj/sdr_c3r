@@ -15,7 +15,7 @@ namespace decimate{
 		public:
 			segment_decimate(int factor):factor(factor)
 			{
-				filter_coeff = filter::fir_lowpass(32,1/double(factor*8));
+				filter_coeff = filter::fir_lowpass(30,1/double(factor*4));
 			}
 			void decimate(vector<T> &in,vector<T> &out){
 				vector<T> filtered;

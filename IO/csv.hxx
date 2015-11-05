@@ -16,4 +16,5 @@ class csv{
 		static int read(string filename,vector<double> &array,int howMany = 0);
 		static int read(string filename,vector<complex<double>> &array,int howMany = 0);
 		static int save(string filename,vector<double> &array,int howMany = 0);
+		static int save(string filename,vector<complex<double>> &array,int howMany = 0);
 };

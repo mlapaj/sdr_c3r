@@ -4,6 +4,7 @@
 
 
 namespace decimate{
+	/*
 	void decimate(vector<complex<double>> in,vector<complex<double>> &out, int factor){
 		vector<double> filter_coeff = filter::fir_lowpass(20,1/(double)factor*2,10000);
 		vector<complex<double>> after_conv;
@@ -14,7 +15,7 @@ namespace decimate{
 		}
 		out = after_dec;
 
-	}
+	}*/
 
 	
 	
