@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 class fourier{
 	private:
 		// for fourier math
@@ -14,27 +15,50 @@ class fourier{
 		complex<double> w;
 		vector<complex<double>> fourier_w;
 		vector<complex<double>> inv_fourier_w;
-		vector<complex<double>>  fft_w;
-		vector<complex<double>>  fft_inv_w;
-		struct pos{
-			int x;
-			int y;
-		};
-		vector<struct pos> sample_pos;
-
 			;
 		// other
-		void calculate_fft_ifft_matrix();
 		void calculate_fourier_w();
 		void calculate_inv_fourier_w();
 	public:
 		fourier(int nPoints);
-		void do_fourier(vector<double> data,vector<complex<double>> &out);
-		void do_fourier(vector<complex<double>> data,vector<complex<double>> &out);
-		void do_inv_fourier(vector<complex<double>> data,vector<double> &out);
-		void do_inv_fourier(vector<complex<double>> data,vector<complex<double>> &out);
-		void do_fft(vector<double> data,vector<complex<double>> &out);
-		void do_fft(vector<complex<double>> data,vector<complex<double>> &out);
-		void do_inv_fft(vector<complex<double>> data,vector<double> &out);
-		void do_inv_fft(vector<complex<double>> data,vector<complex<double>> &out);
+		template <typename T_in, typename T_out>
+			void do_fourier(vector<T_in> data,vector<complex<T_out>> &out){
+				out.resize(nPoints);
+				for (int k=0;k<(int) nPoints;++k){
+					complex<T_out> wsp = 0;
+					for (int n=0;n<nPoints;++n){
+						//wsp = wsp + data.at(n) * fourier_w[k*nPoints+n];
+						wsp = wsp + data.at(n) * pow(w,(-k)*n);
+					}
+					out.at(k) = wsp;
+				}
+				return;
+			}
+		template <typename T_in, typename T_out>
+			void do_inv_fourier(vector<complex<T_in>> data,vector<complex<T_out>> &out){
+				out.resize(nPoints);
+				for (int k=0;k<(int) nPoints;++k){
+					complex<T_out> wsp = 0;
+					for (int n=0;n<nPoints;++n){
+						// wsp = wsp + data.at(n) * inv_fourier_w[k*nPoints+n]; // * pow(w,(k)*n);
+						wsp = wsp + data.at(n) * pow(w,(k)*n);
+					}
+					out.at(k) = wsp / (T_out) nPoints;
+				}
+				return;
+			}
+
+		template <typename T_in, typename T_out>
+			void do_inv_fourier(vector<complex<T_in>> data,vector<T_out> &out){
+				out.resize(nPoints);
+				for (int k=0;k<(int) nPoints;++k){
+					complex<T_out> wsp = 0;
+					for (int n=0;n<nPoints;++n){
+						// wsp = wsp + data.at(n) * inv_fourier_w[k*nPoints+n]; // * pow(w,(k)*n);
+						wsp = wsp + data.at(n) * pow(w,(k)*n);
+					}
+					out.at(k) = abs(wsp)/nPoints;
+				}
+				return;
+			}
 };

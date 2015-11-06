@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "DSP/fourier.hxx"
+#include "DSP/fft.hxx"
 #include "DSP/convolution.hxx"
 #include "IO/csv.hxx"
 #include "MISC/benchmark_timer.hxx"
@@ -127,12 +128,12 @@ TEST(DSPTest, FFT_Complex) {
 		vector<complex<double>> data;
 		vector<complex<double>> out;
 		vector<complex<double>> compare;
-		fourier oFourier(nPoints);
+		fft oFFT(nPoints);
 
 		csv::read(samples_dir+complex_samples,data,nPoints);
 
 		benchmark_timer t;
-		oFourier.do_fft(data,out);
+		oFFT.do_fft(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
@@ -154,12 +155,12 @@ TEST(DSPTest, FFT) {
 		vector<double> data;
 		vector<complex<double>> out;
 		vector<complex<double>> compare;
-		fourier oFourier(nPoints);
+		fft oFFT(nPoints);
 
 		csv::read(samples_dir+samples,data,nPoints);
 
 		benchmark_timer t;
-		oFourier.do_fft(data,out);
+		oFFT.do_fft(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
@@ -180,14 +181,14 @@ TEST(DSPTest, Inv_FFT_Complex) {
 		vector<complex<double>> data;
 		vector<complex<double>> out;
 		vector<complex<double>> compare;
-		fourier oFourier(nPoints);
+		fft oFFT(nPoints);
 
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
 		csv::read(ss.str(),data,nPoints);
 
 		benchmark_timer t;
-		oFourier.do_inv_fft(data,out);
+		oFFT.do_inv_fft(data,out);
 		t.print();
 		csv::read(samples_dir+complex_samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
@@ -207,14 +208,14 @@ TEST(DSPTest, Inv_FFT) {
 		vector<complex<double>> data;
 		vector<double> out;
 		vector<double> compare;
-		fourier oFourier(nPoints);
+		fft oFFT(nPoints);
 
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
 		csv::read(ss.str(),data,nPoints);
 
 		benchmark_timer t;
-		oFourier.do_inv_fft(data,out);
+		oFFT.do_inv_fft(data,out);
 		t.print();
 		csv::read(samples_dir+samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());

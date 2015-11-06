@@ -13,7 +13,7 @@ radio::radio(shared_ptr<radioSignal> signal)
 	mainWindow->show();
 	signalSamplingRate = signal->getSamplingRate();
 	signalFrequency = signal->getSignalFrequency();
-	oFourier.reset(new fourier(1024));
+	oFFT.reset(new fft(1024));
 
 }
 
@@ -87,7 +87,7 @@ void radio::processRadio(){
 		vector<double> id;
 		id.resize(signalDecimated.size());
 
-		cout << "signal decimated" << signalDecimated.size() << endl;
+		//cout << "signal decimated" << signalDecimated.size() << endl;
 		for (int i=0;i<signalDecimated.size();++i){
 			complex<double> val = signalDecimated[i] / abs(signalDecimated[i]);
 			rd[i] = val.real();
@@ -100,7 +100,7 @@ void radio::processRadio(){
 		vector<double> bid;
 		convolution::do_segment_conv(bid_overlap,id,b,bid_tmp);
 		int toDel = abs((bid_tmp.size() + bid_overlap.size()) - id.size());
-		cout << "to del:" << toDel << endl;
+		//cout << "to del:" << toDel << endl;
 		//return;
 		bid.insert(bid.end(),bid_tmp.begin(),bid_tmp.end());
 		bid.insert(bid.end(),bid_overlap.begin(),bid_overlap.end());
@@ -153,9 +153,9 @@ void radio::processRadio(){
 
 		data_file.close();
 
-		cout << "decimated size" << afterFMdecimate.size() << endl;
-		oFourier->do_fft(afterFMdecimate,signalSpectrum);
-		mainWindow->updateSpectrum(signalSpectrum);
+		//cout << "decimated size" << afterFMdecimate.size() << endl;
+		// oFFT->do_fft(afterFMdecimate,signalSpectrum);
+		// mainWindow->updateSpectrum(signalSpectrum);
 		}
 		signalDecimated.clear();
 		signalSpectrum.clear();

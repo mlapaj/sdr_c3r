@@ -3,7 +3,7 @@
 
 #include "radioSignal.hxx"
 #include "../GUI/mainwindow.h"
-#include "../DSP/fourier.hxx"
+#include "../DSP/fft.hxx"
 #include "../DSP/filter.hxx"
 #include "../DSP/convolution.hxx"
 
@@ -31,7 +31,7 @@ class radio: public QThread
 		// radio object
 		shared_ptr<radioSignal> signal;
 		shared_ptr<MainWindow> mainWindow;
-		shared_ptr<fourier> oFourier;
+		shared_ptr<fft> oFFT;
 		
 		
 };
