@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 #include "QSpectrum.hxx"
-#include "../IO/iq_data_reader.hxx"
-#include "../DSP/fourier.hxx"
 #include <vector>
 #include <array>
 #include <algorithm>
@@ -83,10 +81,7 @@ void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 	p_data = data;
 }
 
-fourier oFourier(1024);
-iq_data_reader iq("test_data/FMcapture1.dat",1024);
 
-long probka=0;
 void QSpectrum::paintEvent(QPaintEvent *event){
 	QTime time;
 	if (!data.empty()){
@@ -158,6 +153,7 @@ void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
 
 	dataMutex.lock();
 	data.push_back(preparedData);
+	
 	dataMutex.unlock();
 	// update();
 }

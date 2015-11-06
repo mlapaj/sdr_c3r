@@ -27,7 +27,7 @@ class fft{
 		fft(int nPoints);
 
 		template <typename T_in,typename T_out>
-		void do_fft(vector<T_in> data,vector<T_out> &out){
+		void do_fft(const vector<T_in> &data,vector<T_out> &out){
 
 			out.resize(nPoints);
 
@@ -56,7 +56,7 @@ class fft{
 		}
 
 		template <typename T>
-		void do_inv_fft(vector<complex<T>> &data,vector<T> &out){
+		void do_inv_fft(const vector<complex<T>> &data,vector<T> &out){
 
 			vector<complex<T>> t_out;
 			t_out.resize(nPoints);
@@ -90,7 +90,7 @@ class fft{
 		}
 
 		template <typename T>
-			void do_inv_fft(vector<complex<T>> &data,vector<complex<T>> &out)		
+			void do_inv_fft(const vector<complex<T>> &data,vector<complex<T>> &out)		
 			{
 				vector<complex<T>> t_out;
 				t_out.resize(nPoints);

@@ -8,22 +8,17 @@
 using namespace std;
 
 namespace decimate{
-	void decimate(vector<complex<double>> in,vector<complex<double>> &out, int factor);
+	void decimate(const vector<complex<double>> &in,vector<complex<double>> &out, int factor);
 
 	template<typename T>
 	class segment_decimate{
 		public:
 			segment_decimate(int factor):factor(factor)
 			{
-				filter_coeff = filter::fir_lowpass(30,1/double(factor*4));
+				filter_coeff = filter::fir_lowpass(16,1/double(factor*4));
 			}
 			void decimate(vector<T> &in,vector<T> &out){
-				vector<T> filtered;
-				convolution::do_segment_conv(overlap,in,filter_coeff,filtered);
-				out.clear();
-				for (int i=0;i<in.size();i+=factor){
-					out.push_back(filtered[i]);
-				}
+				convolution::do_segment_conv(overlap,in,filter_coeff,out,factor);
 			}
 			void clear_overlap(){
 				overlap.clear();

@@ -35,7 +35,7 @@ class fourier{
 				return;
 			}
 		template <typename T_in, typename T_out>
-			void do_inv_fourier(vector<complex<T_in>> data,vector<complex<T_out>> &out){
+			void do_inv_fourier(const vector<complex<T_in>> &data,vector<complex<T_out>> &out){
 				out.resize(nPoints);
 				for (int k=0;k<(int) nPoints;++k){
 					complex<T_out> wsp = 0;
@@ -49,7 +49,7 @@ class fourier{
 			}
 
 		template <typename T_in, typename T_out>
-			void do_inv_fourier(vector<complex<T_in>> data,vector<T_out> &out){
+			void do_inv_fourier(const vector<complex<T_in>> &data,vector<T_out> &out){
 				out.resize(nPoints);
 				for (int k=0;k<(int) nPoints;++k){
 					complex<T_out> wsp = 0;
