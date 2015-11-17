@@ -1,1 +1,1 @@
-add_library(IO csv.cxx iq_data_reader.cxx)
+add_library(IO iq_data_reader.cxx)
