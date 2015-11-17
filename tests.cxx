@@ -291,6 +291,7 @@ TEST(DSPTest, Convolution_Segment) {
 			for (int i=0;i<128 && j < data.size();++i){
 				data_segment.push_back(data[j++]);
 			}
+			out.clear();
 			convolution::do_segment_conv(overlap,data_segment,impulse,out);
 			out_final.insert(out_final.end(),out.begin(),out.end());
 		}

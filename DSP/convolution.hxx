@@ -33,15 +33,19 @@ namespace convolution{
 		vector<T> copy_overlap = overlap;
 		out.reserve(data.size()/every_sample);
 		int datalength =data.size();
-		int retlength = out.size() + response.size() -1;
+		int retlength = data.size() + response.size() -1;
 		int responselength = response.size();
 
 		overlap.resize(response.size()-1);
 		int end = 0;
 		if (every_sample == 1)
+		{
 			end = retlength;
+		}
 		else
+		{
 			end = data.size();
+		}
 			
 		for (int i=0;i<end;i+=every_sample){
 			T val = 0;
@@ -51,8 +55,8 @@ namespace convolution{
 					val += data[i-j] * response[j];
 				}
 			}
-			if (i<data.size()){
-				out.push_back(val);	
+			if (out.size()<data.size()){
+				out.push_back(val);
 			}
 			else if (i-out.size()<overlap.size())
 			{
