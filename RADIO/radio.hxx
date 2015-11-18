@@ -27,11 +27,14 @@ class radio: public QThread
 		long currentFrequency = 0;
 		long sinePhase = 0;
 		long maxSinePhase = 0;
+		long shiftFrequency = 0;
 
 		// radio object
 		shared_ptr<radioSignal> signal;
 		shared_ptr<MainWindow> mainWindow;
 		shared_ptr<fft> oFFT;
+		vector<complex<double>> shiftSine;
+		void calculateShiftSine();
 		
 		
 };

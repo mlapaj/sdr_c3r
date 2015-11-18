@@ -15,7 +15,7 @@ namespace decimate{
 		public:
 			segment_decimate(int factor):factor(factor)
 			{
-				filter_coeff = filter::fir_lowpass(16,1/double(factor*4));
+				filter_coeff = filter::fir_lowpass(30,1/double(factor*4));
 			}
 			void decimate(vector<T> &in,vector<T> &out){
 				convolution::do_segment_conv(overlap,in,filter_coeff,out,factor);

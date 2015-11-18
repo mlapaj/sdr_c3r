@@ -28,10 +28,10 @@ namespace convolution{
 	template<typename T> void do_segment_conv
 		(vector<T> &overlap,const vector<T> &data,const vector<double> &response,vector<T> &out,int every_sample=1){
 		if (response.size() > data.size()){
-			cout << "response size > data size !!!! wrong" << endl;
+			// cout << "response size > data size !!!! wrong" << endl;
 		}
 		vector<T> copy_overlap = overlap;
-		out.reserve(data.size()/every_sample);
+		out.resize(data.size()/every_sample);
 		int datalength =data.size();
 		int retlength = data.size() + response.size() -1;
 		int responselength = response.size();
@@ -46,7 +46,10 @@ namespace convolution{
 		{
 			end = data.size();
 		}
-			
+		int pos = 0;	
+
+//#pragma omp for shared(out, copy_overlap)	
+//#pragma omp for
 		for (int i=0;i<end;i+=every_sample){
 			T val = 0;
 			for(int j=0;j<responselength;j++)
@@ -55,8 +58,8 @@ namespace convolution{
 					val += data[i-j] * response[j];
 				}
 			}
-			if (out.size()<data.size()){
-				out.push_back(val);
+			if (pos<data.size()){
+				out[pos++] = val;
 			}
 			else if (i-out.size()<overlap.size())
 			{
@@ -66,7 +69,7 @@ namespace convolution{
 		}
 
 		if (every_sample != 1){
-			for (int i=data.size();i<retlength;i++){
+			for (int i=data.size();i<retlength;i+=every_sample){
 				T val = 0;
 				for(int j=0;j<responselength;j++)
 				{
@@ -82,7 +85,6 @@ namespace convolution{
 		}
 
 		}
-
 		for (int i=0;i<copy_overlap.size() && i < out.size();i++){
 			out[i] += copy_overlap[i];
 		}
@@ -95,7 +97,7 @@ namespace convolution{
 		}
 		vector<T> copy_overlap = overlap;
 		out.clear();
-		out.reserve(data.size());
+		out.resize(data.size());
 		long datalength =data.size();
 		long retlength = data.size() + response.size() -1;
 		long responselength = response.size();
@@ -103,6 +105,8 @@ namespace convolution{
 		int toDel = abs(retlength - data.size()) / 2;
 
 		overlap.resize(response.size()-1);
+		int pos = 0;
+//#pragma omp for
 		for (int i=0;i<retlength;i++){
 			T val = 0;
 			for(int j=0;j<responselength;j++)
@@ -111,9 +115,9 @@ namespace convolution{
 					val += data[i-j] * response[j];
 				}
 			}
-			if (out.size()<data.size()){
+			if (pos<data.size()){
 				if (i>toDel){
-					out.push_back(val);
+					out[pos++] = val;
 				}
 			}
 			
@@ -123,7 +127,6 @@ namespace convolution{
 			}
 			
 		}
-
 		for (int i=0;i<copy_overlap.size() && i < out.size();i++){
 			if (i>toDel){				
 				out[i] += copy_overlap[i];

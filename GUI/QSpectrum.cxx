@@ -19,7 +19,7 @@ QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
 
 	prepareDisplay(pixels);
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
-	timer.start( 30 );
+	timer.start( 10 );
     CreatePalete();
 	zeroAtCenter = false;
 }
@@ -119,7 +119,7 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	memset(pixels,0x00,sizeof(QRgb)*D_WIDTH*height()*2);
 	image = new QImage((uchar*)pixels,D_WIDTH,height()*2, QImage::Format_RGB32);
 	prepareDisplay(pixels);
-	timer.start(30);
+	timer.start(10);
 	// trza dorzucic locka
 	
 	QWidget::resizeEvent(event);
@@ -146,7 +146,7 @@ void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
 		preparedData.push_back(val);
 	}
 
-	if (zeroAtCenter)
+	//if (zeroAtCenter)
 	{
 		rotate(preparedData.begin(),preparedData.begin()+preparedData.size()/2,preparedData.end());
 	}

@@ -14,7 +14,8 @@ radio::radio(shared_ptr<radioSignal> signal)
 	signalSamplingRate = signal->getSamplingRate();
 	signalFrequency = signal->getSignalFrequency();
 	oFFT.reset(new fft(1024));
-
+	shiftFrequency = 178000;
+	calculateShiftSine();
 }
 
 void radio::calculateFrequencyValues(){
@@ -31,7 +32,16 @@ radio::~radio(){
 
 }
 
+void radio::calculateShiftSine(){
+	shiftSine.clear();
+	for (int i=0;i< (signalSamplingRate / shiftFrequency) * 20; i++ ){
+			shiftSine.push_back(exp(complex<double>(0,-2*M_PI*(double)(shiftFrequency)*double(i)/signalSamplingRate)));	
+	}
+
+}
+
 void radio::processRadio(){
+	benchmark_timer t;
 	vector<complex<double>> signalDecimated;
 	vector<complex<double>> signalSpectrum;
 	vector<complex<double>> signalAfterDecimation;
@@ -68,26 +78,40 @@ void radio::processRadio(){
 	b.push_back(0);
 	b.push_back(-1);
 
+	int sinePhase =0;
+	
+	vector<double> demodulated;
+	vector<double> afterFMdecimate;
+	vector<complex<double>> signalInput;
+
+	signalInput.reserve(8192);
+	signalDecimated.reserve(1024);
+	signalAfterDecimation.reserve(1024);
+
 	while(!quit)
 	{
-		vector<complex<double>> signalInput;
-		signalInput.reserve(8192);
-		signalDecimated.reserve(1024);
-		signalAfterDecimation.reserve(1024);
+	//	cout << "************" << endl;
+		t.reset();
+	//	t.print();
 
 		while (signalDecimated.size() < 1024){
+		// t.print();
 			signalInput.clear();
 			signal->getSignal(signalInput);
-
-			for (auto iter = signalInput.begin();iter!=signalInput.end();++iter)
+			if (signalInput.size() == 0) break;
+	//	t.print();
+			for (int i = 0;i < signalInput.size() ; ++i)
 			{
-				(*iter) *= exp(complex<double>(0,-2*M_PI*(double)(178000)*double(sinePhase)/signalSamplingRate));	
-				sinePhase+=1; // todo:  add max phase value
+				signalInput[i] *= (shiftSine[sinePhase++]);
+			    if (sinePhase>=shiftSine.size()) sinePhase = 0;
 			}
 			
+	//	t.print();
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 		}
+		// t.print();
+	//	cout << " after decimation" << endl;
 		long beforFMsize = signalDecimated.size();
 
 
@@ -101,23 +125,21 @@ void radio::processRadio(){
 
 		convolution::do_segment_conv_same(bid_overlap,id,b,bid);
 		convolution::do_segment_conv_same(brd_overlap,rd,b,brd);
-
-		vector<double> demodulated;
+		
 		demodulated.resize(beforFMsize);
-
 		for (int i=0;i<bid.size();i++){
 			demodulated[i] = ( (id[i] * brd[i]) - (rd[i] * bid[i]) ) / ((rd[i] * rd[i]) + (id[i] * id[i]));
 		}
 
+		//t.print();
 		beforeDecimation.insert(beforeDecimation.end(),demodulated.begin(),demodulated.end());
-		vector<double> dataForDecimation;
+		//t.print();
 		if (beforeDecimation.size() >= 10240){
-
-			vector<double> afterFMdecimate;
+			afterFMdecimate.clear();
 			oDemodulatedDecimate.decimate(beforeDecimation,afterFMdecimate);
 			beforeDecimation.clear();
 
-/*
+
 			ofstream data_file;      // pay attention here! ofstream
 			data_file.open("data.bin", ios::in | ios::out | ios::binary);
 			data_file.seekp(0, ios::end); 
@@ -130,14 +152,16 @@ void radio::processRadio(){
 			}
 
 			data_file.close();
-*/
 			//cout << "decimated size" << afterFMdecimate.size() << endl;
+
 			oFFT->do_fft(afterFMdecimate,signalSpectrum);
 			mainWindow->updateSpectrum(signalSpectrum);
 			signalSpectrum.clear();
 		}
 		
 		signalAfterDecimation.clear();
+		// t.print();
+		// return;
 		
 	}
 

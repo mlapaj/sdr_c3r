@@ -18,5 +18,6 @@ public:
 private:
 	unique_ptr<ifstream> file;
 	int block_size;
+	char *buffer;
 	/* data */
 };
