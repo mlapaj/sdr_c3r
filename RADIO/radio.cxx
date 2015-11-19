@@ -73,21 +73,26 @@ void radio::processRadio(){
 				quit = true;
 				break;
 			}
+/*
 			// do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
 			{
 				signalInput[i] *= (shiftSine[sinePhase++]);
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
+*/
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();
 		}
 
 		oWFMdecoder->decode(signalDecimated,audio);
-		signalDecimated.clear();
+		
 		oFFT->do_fft(audio,signalSpectrum);
 		mainWindow->updateSpectrum(signalSpectrum);
+
+		saveRawDataToFile("data.bin",audio);
+		signalDecimated.clear();
 		signalSpectrum.clear();
 
 	}
