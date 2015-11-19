@@ -1,11 +1,16 @@
 #include <memory>
 #include <iostream>
 
+
 #include "radioSignal.hxx"
+#include "WFMdecoder.hxx"
+
 #include "../GUI/mainwindow.h"
 #include "../DSP/fft.hxx"
 #include "../DSP/filter.hxx"
 #include "../DSP/convolution.hxx"
+
+
 
 #include <QtCore>
 class radio: public QThread
@@ -33,8 +38,14 @@ class radio: public QThread
 		shared_ptr<radioSignal> signal;
 		shared_ptr<MainWindow> mainWindow;
 		shared_ptr<fft> oFFT;
+		shared_ptr<WFMdecoder<double>> oWFMdecoder;
 		vector<complex<double>> shiftSine;
+		
 		void calculateShiftSine();
+		
+		// misc functions
+		void saveRawDataToFile(string filename,vector<double> data);
+
 		
 		
 };

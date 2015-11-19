@@ -96,7 +96,6 @@ namespace convolution{
 			cout << "response size > data size !!!! wrong" << endl;
 		}
 		vector<T> copy_overlap = overlap;
-		out.clear();
 		out.resize(data.size());
 		long datalength =data.size();
 		long retlength = data.size() + response.size() -1;

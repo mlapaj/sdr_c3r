@@ -8,12 +8,12 @@
 using namespace std;
 
 radio::radio(shared_ptr<radioSignal> signal)
-	:signal(signal),mainWindow(new MainWindow()){
+	:signal(signal),mainWindow(new MainWindow()),oWFMdecoder(new WFMdecoder<double>(10240)),
+	oFFT(new fft(1024)){
 	DLOG(INFO) << "created constructor";
 	mainWindow->show();
 	signalSamplingRate = signal->getSamplingRate();
 	signalFrequency = signal->getSignalFrequency();
-	oFFT.reset(new fft(1024));
 	shiftFrequency = 178000;
 	calculateShiftSine();
 }
@@ -40,130 +40,76 @@ void radio::calculateShiftSine(){
 
 }
 
+
 void radio::processRadio(){
 	benchmark_timer t;
+	bool quit = false;
+	
+	int downSampleFactor = 8;
+	decimate::segment_decimate<complex<double>> oDecimate(downSampleFactor);
 	vector<complex<double>> signalDecimated;
 	vector<complex<double>> signalSpectrum;
 	vector<complex<double>> signalAfterDecimation;
-
 	vector<double> demodulatedSignal;
 
-
-	signalSpectrum.reserve(1024);
-	bool quit = false;
-
-
-	vector<double> beforeDecimation;
-	beforeDecimation.reserve(10240);
-
-	vector<double> rd;
-	vector<double> id;
-	id.resize(1024);
-	rd.resize(1024);
-	vector<double> brd;
-	vector<double> bid;
-	brd.resize(1024);
-	bid.resize(1024);
-
-	vector<double> bid_overlap;
-	vector<double> brd_overlap;
-
-	vector<double> fmSignal;
-	decimate::segment_decimate<complex<double>> oDecimate(8);
-	decimate::segment_decimate<double> oDemodulatedDecimate(10);
-	
-	vector<double> b;		
-	//csv::read("test_data/firls.txt",b);
-	b.push_back(1);
-	b.push_back(0);
-	b.push_back(-1);
-
 	int sinePhase =0;
-	
-	vector<double> demodulated;
-	vector<double> afterFMdecimate;
+
+	vector<double> audio;
 	vector<complex<double>> signalInput;
-
-	signalInput.reserve(8192);
-	signalDecimated.reserve(1024);
+	
+	signalInput.reserve(1024 * downSampleFactor);
 	signalAfterDecimation.reserve(1024);
+	signalDecimated.reserve(10240);
+	signalSpectrum.reserve(1024);
 
+	t.reset();
 	while(!quit)
 	{
-	//	cout << "************" << endl;
-		t.reset();
-	//	t.print();
-
-		while (signalDecimated.size() < 1024){
-		// t.print();
+		
+		while (signalDecimated.size() < 10240){
 			signalInput.clear();
 			signal->getSignal(signalInput);
-			if (signalInput.size() == 0) break;
-	//	t.print();
-			for (int i = 0;i < signalInput.size() ; ++i)
+			if (signalInput.size() == 0) {
+				quit = true;
+				break;
+			}
+			// do frequency shift
+			for (int i = 0;i < (int) signalInput.size() ; ++i)
 			{
 				signalInput[i] *= (shiftSine[sinePhase++]);
-			    if (sinePhase>=shiftSine.size()) sinePhase = 0;
+				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
-			
-	//	t.print();
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
+			signalAfterDecimation.clear();
 		}
-		// t.print();
-	//	cout << " after decimation" << endl;
-		long beforFMsize = signalDecimated.size();
 
-
-
-		for (int i=0;i<signalDecimated.size();++i){
-			complex<double> val = signalDecimated[i] / abs(signalDecimated[i]);
-			rd[i] = val.real();
-			id[i] = val.imag();
-		}
+		oWFMdecoder->decode(signalDecimated,audio);
 		signalDecimated.clear();
+		oFFT->do_fft(audio,signalSpectrum);
+		mainWindow->updateSpectrum(signalSpectrum);
+		signalSpectrum.clear();
 
-		convolution::do_segment_conv_same(bid_overlap,id,b,bid);
-		convolution::do_segment_conv_same(brd_overlap,rd,b,brd);
-		
-		demodulated.resize(beforFMsize);
-		for (int i=0;i<bid.size();i++){
-			demodulated[i] = ( (id[i] * brd[i]) - (rd[i] * bid[i]) ) / ((rd[i] * rd[i]) + (id[i] * id[i]));
-		}
-
-		//t.print();
-		beforeDecimation.insert(beforeDecimation.end(),demodulated.begin(),demodulated.end());
-		//t.print();
-		if (beforeDecimation.size() >= 10240){
-			afterFMdecimate.clear();
-			oDemodulatedDecimate.decimate(beforeDecimation,afterFMdecimate);
-			beforeDecimation.clear();
+	}
+	t.print();
+	cout << "end of radio processing" << endl;
 
 
+}
+
+void radio::saveRawDataToFile(string filename,vector<double> data){
 			ofstream data_file;      // pay attention here! ofstream
-			data_file.open("data.bin", ios::in | ios::out | ios::binary);
+			data_file.open(filename, ios::in | ios::out | ios::binary);
 			data_file.seekp(0, ios::end); 
 
-			size_t size = afterFMdecimate.size();
+			size_t size = data.size();
 
 			for (int i = 0; i < size; ++i)
 			{
-				data_file.write(reinterpret_cast<char*>(&afterFMdecimate[i]), sizeof(double));
+				data_file.write(reinterpret_cast<char*>(&data[i]), sizeof(double));
 			}
 
 			data_file.close();
-			//cout << "decimated size" << afterFMdecimate.size() << endl;
-
-			oFFT->do_fft(afterFMdecimate,signalSpectrum);
-			mainWindow->updateSpectrum(signalSpectrum);
-			signalSpectrum.clear();
-		}
-		
-		signalAfterDecimation.clear();
-		// t.print();
-		// return;
-		
-	}
-
-		
 }
+
+
