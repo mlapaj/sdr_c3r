@@ -36,7 +36,7 @@ int main(int argc,char **argv){
 	int nPoints;
 	LOG(INFO) << "Starting app..";
 
-	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture2.dat",8192));
+	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",8192));
 	unique_ptr<radio> oRadio(new radio(oSignal));
     oRadio->start();	
 	return app.exec();

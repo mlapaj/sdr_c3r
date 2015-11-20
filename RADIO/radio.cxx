@@ -14,7 +14,8 @@ radio::radio(shared_ptr<radioSignal> signal)
 	mainWindow->show();
 	signalSamplingRate = signal->getSamplingRate();
 	signalFrequency = signal->getSignalFrequency();
-	shiftFrequency = 178000;
+	// shiftFrequency = 178000;
+    shiftFrequency = 978000;
 	calculateShiftSine();
 }
 
@@ -22,7 +23,14 @@ void radio::calculateFrequencyValues(){
 	maxTuneOffset = signalSamplingRate * 0.5;
 	maxFrequency = signalFrequency + maxTuneOffset;
 	minFrequency = signalFrequency - maxTuneOffset;
-	currentFrequency = signalFrequency;
+	cout << "Sig freq " << signalFrequency << endl;
+	cout << "Max freq " << maxFrequency << endl;
+	cout << "Min freq " << minFrequency << endl;
+	cout << "Max offset " << maxTuneOffset << endl;
+	mainWindow->setMinMaxFrequency(minFrequency,maxFrequency);
+	currentFrequency = signalFrequency + shiftFrequency;
+	cout << "Cur freq " << currentFrequency << endl;
+	mainWindow->setSelectedFrequency(currentFrequency,300000);
 	maxSinePhase = 1024;
 
 }
@@ -34,7 +42,8 @@ radio::~radio(){
 
 void radio::calculateShiftSine(){
 	shiftSine.clear();
-	for (int i=0;i< (signalSamplingRate / shiftFrequency) * 20; i++ ){
+	// TODO: get size of sine
+	for (int i=0;i< (signalSamplingRate) ; i++ ){
 			shiftSine.push_back(exp(complex<double>(0,-2*M_PI*(double)(shiftFrequency)*double(i)/signalSamplingRate)));	
 	}
 
@@ -42,6 +51,8 @@ void radio::calculateShiftSine(){
 
 
 void radio::processRadio(){
+	calculateFrequencyValues();
+
 	benchmark_timer t;
 	bool quit = false;
 	
@@ -72,15 +83,19 @@ void radio::processRadio(){
 			if (signalInput.size() == 0) {
 				quit = true;
 				break;
-			}
-/*
-			// do frequency shift
+			}	
+		
+	
+
+			//do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
 			{
 				signalInput[i] *= (shiftSine[sinePhase++]);
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
-*/
+
+		
+		
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();

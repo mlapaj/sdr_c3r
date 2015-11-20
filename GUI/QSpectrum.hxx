@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 #include <complex>
+
+#include <iostream>
 using namespace std;
 // http://www.kuqin.com/qtdocument/designer-manual-6.html
 
@@ -17,6 +19,26 @@ public:
 	QSpectrum (QWidget *parent);
 	void setZeroAtCenter(bool param);
 	void addSpectrumData(vector<complex<double>> spectrumData);
+	void setSelectedFrequencyAndWidth(long freq,long width){
+		selectedFreq = freq;
+		selectedFreqWidth = width;
+		updateFreqPos();
+	}
+
+	void updateFreqPos(){
+		selectedFreqWidthSize = abs(((selectedFreqWidth) / (double) bandWidth) * 1024);
+		if ((selectedFreq > minFrequency) && (selectedFreq < maxFrequency))
+		{
+			selectedFreqPos = (((selectedFreq - minFrequency) / (double) bandWidth) * (double) 1024) 
+				- selectedFreqWidthSize/(double)2;
+		}
+		qDebug() << "selectedFreqPos" << selectedFreqPos;
+	}
+	void setMinMaxFrequency(long min,long max){
+		minFrequency = min;
+		maxFrequency = max;
+		bandWidth = abs(max-min);
+	}
 	virtual ~QSpectrum (){
 	}
 
@@ -43,5 +65,12 @@ private:
 	void prepareDisplay(QRgb *pixels);
 	void drawLine(QRgb *pixels,vector<int> data);
 	bool zeroAtCenter;
-	/* data */
+	long minFrequency;
+	long maxFrequency;
+	long bandWidth;
+
+	long selectedFreq;
+	long selectedFreqPos;
+	long selectedFreqWidth;
+	long selectedFreqWidthSize;
 };

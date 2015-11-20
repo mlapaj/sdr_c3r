@@ -17,6 +17,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
 	void updateSpectrum(vector<complex<double>> spectrum);
+	void setMinMaxFrequency(long min, long max);
+	void setSelectedFrequency(long freq, long width);
     ~MainWindow();
 
 private:

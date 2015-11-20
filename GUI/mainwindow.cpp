@@ -24,12 +24,20 @@ void MainWindow::updateSpectrum(vector<complex<double>> spectrum){
 }
 
 void MainWindow::handleCheckbox(){
-	if (ui->checkBox->isChecked()){
+	if (!ui->checkBox->isChecked()){
 		ui->qspectrum->setZeroAtCenter(true);
 	}
 	else
 	{
 		ui->qspectrum->setZeroAtCenter(false);
 	}
-cout << "!!!" << endl;
+	cout << "!!!" << endl;
+}
+
+void MainWindow::setMinMaxFrequency(long min, long max){
+	ui->qspectrum->setMinMaxFrequency(min,max);
+}
+
+void MainWindow::setSelectedFrequency(long freq, long width){
+	ui->qspectrum->setSelectedFrequencyAndWidth(freq,width);
 }

@@ -21,7 +21,9 @@ QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
 	timer.start( 10 );
     CreatePalete();
-	zeroAtCenter = false;
+	zeroAtCenter = true;
+	selectedFreqPos = 0;
+	selectedFreqWidth = 0;
 }
 
 
@@ -73,7 +75,6 @@ void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 		for (int x = 0; x < D_WIDTH && x < data.size(); ++x) {
 			int ccol = (1*data[x] + 1 * p_data[x] + 1 *pp_data[x] + 1 * ppp_data[x])/4;
 			if (ccol>254) ccol=254;
-//			data[x] = ccol; //dirty hack
 			pixels[x] = getColor(ccol);
 		}
     ppp_data = pp_data;
@@ -92,6 +93,10 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 		int pos_src = D_WIDTH * height();
 		memcpy(&pixels[pos_dst],&pixels[pos_src],D_WIDTH*height()*sizeof(QRgb));
 	}
+	if (zeroAtCenter)
+	{
+		rotate(data.front().begin(),data.front().begin()+data.front().size()/2,data.front().end());
+	}
     drawLine(&pixels[dupa * D_WIDTH],data.front());	
 	dataMutex.lock();
 	data.pop_front();
@@ -101,6 +106,7 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	painter.begin(this);
 	painter.scale(width()/(float)1024,1);
 	painter.drawImage(0, 0, *image,0,dupa-height());
+	painter.fillRect(selectedFreqPos,0,selectedFreqWidthSize,height(),QBrush(QColor(50, 50, 255, 128)));
 	painter.end();
 	
 	if (!( dupa % 100))
@@ -118,6 +124,8 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	pixels = new QRgb[D_WIDTH*height()*2];
 	memset(pixels,0x00,sizeof(QRgb)*D_WIDTH*height()*2);
 	image = new QImage((uchar*)pixels,D_WIDTH,height()*2, QImage::Format_RGB32);
+	
+	updateFreqPos();
 	prepareDisplay(pixels);
 	timer.start(10);
 	// trza dorzucic locka
@@ -146,10 +154,7 @@ void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
 		preparedData.push_back(val);
 	}
 
-	//if (zeroAtCenter)
-	{
-		rotate(preparedData.begin(),preparedData.begin()+preparedData.size()/2,preparedData.end());
-	}
+
 
 	dataMutex.lock();
 	data.push_back(preparedData);
