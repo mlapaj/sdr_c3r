@@ -162,3 +162,13 @@ void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
 	dataMutex.unlock();
 	// update();
 }
+
+void QSpectrum::mouseMoveEvent(QMouseEvent *e)
+{
+	if(e->buttons() == Qt::LeftButton){
+		qDebug() << "Only right button" << e->x() / (double)width() * 1024;
+		if (freqChange)
+			freqChange(0,0);
+	}
+
+}

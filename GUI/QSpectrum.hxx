@@ -39,6 +39,14 @@ public:
 		maxFrequency = max;
 		bandWidth = abs(max-min);
 	}
+	void subscribeFrequencyChange(int (*freqChange)(long,long)){
+		this->freqChange = freqChange;
+	}
+
+	long getSelectedWidth(){
+
+	}
+
 	virtual ~QSpectrum (){
 	}
 
@@ -49,6 +57,7 @@ protected:
 	QImage *image;
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
+	void mouseMoveEvent(QMouseEvent *e);
 	void CreatePalete();
 	QRgb getColor(unsigned char val);
 	list<vector<int>> data;
@@ -73,4 +82,5 @@ private:
 	long selectedFreqPos;
 	long selectedFreqWidth;
 	long selectedFreqWidthSize;
+	int (*freqChange)(long,long);
 };

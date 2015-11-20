@@ -41,3 +41,7 @@ void MainWindow::setMinMaxFrequency(long min, long max){
 void MainWindow::setSelectedFrequency(long freq, long width){
 	ui->qspectrum->setSelectedFrequencyAndWidth(freq,width);
 }
+
+void MainWindow::subscribeFrequencyChange(int (*functionPtr)(long,long)){
+	ui->qspectrum->subscribeFrequencyChange(functionPtr);
+}

@@ -19,6 +19,8 @@ public:
 	void updateSpectrum(vector<complex<double>> spectrum);
 	void setMinMaxFrequency(long min, long max);
 	void setSelectedFrequency(long freq, long width);
+    void subscribeFrequencyChange(int (*functionPtr)(long,long));
+    void getSelectedWidth();
     ~MainWindow();
 
 private:
