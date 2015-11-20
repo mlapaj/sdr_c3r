@@ -23,7 +23,10 @@ class radio: public QThread
 			processRadio();
 		}
 		void test(long jeden, long dwa){
-			qDebug() << "Test!!!!";
+			shiftFrequency = jeden - signalFrequency;
+			qDebug() << "shift" << shiftFrequency << endl;
+		calculateFrequencyValues();
+		calculateShiftSine();
 		}
 		void processRadio();
 		long signalSamplingRate = 0; // radio sampling rate

@@ -184,10 +184,10 @@ void QSpectrum::mouseMoveEvent(QMouseEvent *e)
 	if (canChangeSelectedFrequency){
 		int val = minFrequency + (e->x() / (double)width() * (maxFrequency-minFrequency));
 		qDebug() << "!val:"<<val<<endl;
-		if (freqChangeCallback)
-			freqChangeCallback(val,selectedFreqWidth);
 		selectedFreq = val;
 		updateFreqPos();
+		if (freqChangeCallback)
+		freqChangeCallback(selectedFreq,selectedFreqWidth);
 	}
 }
 

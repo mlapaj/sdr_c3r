@@ -47,7 +47,11 @@ radio::~radio(){
 void radio::calculateShiftSine(){
 	shiftSine.clear();
 	// TODO: get size of sine
-	for (int i=0;i< (signalSamplingRate) ; i++ ){
+	int val = 0;
+	if (shiftFrequency){
+	val = signalSamplingRate/abs(shiftFrequency);
+	}
+	for (int i=0;i< 360*3 ; i++ ){
 			shiftSine.push_back(exp(complex<double>(0,-2*M_PI*(double)(shiftFrequency)*double(i)/signalSamplingRate)));	
 	}
 
@@ -88,7 +92,6 @@ void radio::processRadio(){
 				quit = true;
 				break;
 			}	
-			oFFT->do_fft(signalInput,signalSpectrum);
 
 			//do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
@@ -97,7 +100,7 @@ void radio::processRadio(){
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
 
-
+			oFFT->do_fft(signalInput,signalSpectrum);
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();
