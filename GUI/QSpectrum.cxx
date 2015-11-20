@@ -24,6 +24,7 @@ QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
 	zeroAtCenter = true;
 	selectedFreqPos = 0;
 	selectedFreqWidth = 0;
+	canChangeSelectedFrequency = false;
 }
 
 
@@ -162,13 +163,32 @@ void QSpectrum::addSpectrumData(vector<complex<double>> spectrumData){
 	dataMutex.unlock();
 	// update();
 }
+void QSpectrum::mousePressEvent(QMouseEvent *e){
 
-void QSpectrum::mouseMoveEvent(QMouseEvent *e)
-{
 	if(e->buttons() == Qt::LeftButton){
-		qDebug() << "Only right button" << e->x() / (double)width() * 1024;
-		if (freqChange)
-			freqChange(0,0);
+		int val = e->x() / (double)width() * 1024;
+		if ((val > selectedFreqPos) && (val < (selectedFreqPos + selectedFreqWidthSize)))
+		{
+			canChangeSelectedFrequency = true;
+
+		}
 	}
 
 }
+
+void QSpectrum::mouseReleaseEvent(QMouseEvent *e){
+	canChangeSelectedFrequency = false;
+}
+void QSpectrum::mouseMoveEvent(QMouseEvent *e)
+{
+	if (canChangeSelectedFrequency){
+		int val = minFrequency + (e->x() / (double)width() * (maxFrequency-minFrequency));
+		qDebug() << "!val:"<<val<<endl;
+		if (freqChangeCallback)
+			freqChangeCallback(val,selectedFreqWidth);
+		selectedFreq = val;
+		updateFreqPos();
+	}
+}
+
+

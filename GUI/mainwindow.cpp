@@ -42,6 +42,6 @@ void MainWindow::setSelectedFrequency(long freq, long width){
 	ui->qspectrum->setSelectedFrequencyAndWidth(freq,width);
 }
 
-void MainWindow::subscribeFrequencyChange(int (*functionPtr)(long,long)){
-	ui->qspectrum->subscribeFrequencyChange(functionPtr);
+void MainWindow::subscribeFrequencyChange(std::function<void(long,long)> callback){
+	ui->qspectrum->subscribeFrequencyChange(callback);
 }

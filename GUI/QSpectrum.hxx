@@ -39,8 +39,9 @@ public:
 		maxFrequency = max;
 		bandWidth = abs(max-min);
 	}
-	void subscribeFrequencyChange(int (*freqChange)(long,long)){
-		this->freqChange = freqChange;
+	void subscribeFrequencyChange(function<void(long,long)> callback){
+		freqChangeCallback = callback;
+		freqChangeCallback(1,1);
 	}
 
 	long getSelectedWidth(){
@@ -57,6 +58,8 @@ protected:
 	QImage *image;
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
 	void mouseMoveEvent(QMouseEvent *e);
 	void CreatePalete();
 	QRgb getColor(unsigned char val);
@@ -82,5 +85,6 @@ private:
 	long selectedFreqPos;
 	long selectedFreqWidth;
 	long selectedFreqWidthSize;
-	int (*freqChange)(long,long);
+	function<void(long,long)> freqChangeCallback;
+	bool canChangeSelectedFrequency;
 };

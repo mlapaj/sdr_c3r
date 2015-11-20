@@ -22,6 +22,9 @@ class radio: public QThread
 		void run(){
 			processRadio();
 		}
+		void test(long jeden, long dwa){
+			qDebug() << "Test!!!!";
+		}
 		void processRadio();
 		long signalSamplingRate = 0; // radio sampling rate
 		long signalFrequency = 0;

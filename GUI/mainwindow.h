@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <vector>
 #include <complex>
+#include <functional>
 using namespace std;
 
 namespace Ui {
@@ -19,7 +20,7 @@ public:
 	void updateSpectrum(vector<complex<double>> spectrum);
 	void setMinMaxFrequency(long min, long max);
 	void setSelectedFrequency(long freq, long width);
-    void subscribeFrequencyChange(int (*functionPtr)(long,long));
+    void subscribeFrequencyChange(std::function<void(long,long)> callback);
     void getSelectedWidth();
     ~MainWindow();
 

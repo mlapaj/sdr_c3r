@@ -5,7 +5,10 @@
 #include <QThread>
 #include "../DSP/decimate.hxx"
 #include "../IO/csv.hxx"
+
+#include <functional>
 using namespace std;
+using namespace std::placeholders;
 
 radio::radio(shared_ptr<radioSignal> signal)
 	:signal(signal),mainWindow(new MainWindow()),oWFMdecoder(new WFMdecoder<double>(10240)),
@@ -17,7 +20,8 @@ radio::radio(shared_ptr<radioSignal> signal)
 	// shiftFrequency = 178000;
     shiftFrequency = 978000;
 	calculateShiftSine();
-}
+	mainWindow->subscribeFrequencyChange(bind(&radio::test, this, _1, _2));
+	}
 
 void radio::calculateFrequencyValues(){
 	maxTuneOffset = signalSamplingRate * 0.5;
@@ -84,8 +88,7 @@ void radio::processRadio(){
 				quit = true;
 				break;
 			}	
-		
-	
+			oFFT->do_fft(signalInput,signalSpectrum);
 
 			//do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
@@ -94,8 +97,7 @@ void radio::processRadio(){
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
 
-		
-		
+
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();
@@ -103,7 +105,6 @@ void radio::processRadio(){
 
 		oWFMdecoder->decode(signalDecimated,audio);
 		
-		oFFT->do_fft(audio,signalSpectrum);
 		mainWindow->updateSpectrum(signalSpectrum);
 
 		saveRawDataToFile("data.bin",audio);
