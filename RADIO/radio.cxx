@@ -84,15 +84,15 @@ void radio::processRadio(){
 	t.reset();
 	while(!quit)
 	{
-		
 		while (signalDecimated.size() < 10240){
 			signalInput.clear();
-			signal->getSignal(signalInput);
-			if (signalInput.size() == 0) {
-				quit = true;
-				break;
-			}	
-
+			while (signalInput.size() < 1024)
+			{
+				if (signal->getSignal(signalInput) == 0){
+					continue;
+				}
+			}
+			oFFT->do_fft(signalInput,signalSpectrum);
 			//do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
 			{
@@ -100,7 +100,6 @@ void radio::processRadio(){
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
 
-			oFFT->do_fft(signalInput,signalSpectrum);
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();

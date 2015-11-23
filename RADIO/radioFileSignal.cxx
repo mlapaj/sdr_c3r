@@ -11,8 +11,8 @@ radioFileSignal::radioFileSignal(string fileName,int bufferSize):
 }
 
 
-void radioFileSignal::getSignal(vector<complex<double>> &out){
-	iq->read_data(out);
+int radioFileSignal::getSignal(vector<complex<double>> &out){
+	return iq->read_data(out);
 }
 
 bool radioFileSignal::isTunable() {
