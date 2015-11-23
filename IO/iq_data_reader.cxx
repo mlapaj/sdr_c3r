@@ -1,7 +1,7 @@
 #include "glog/logging.h"
 #include "iq_data_reader.hxx"
 
-iq_data_reader::iq_data_reader(string fileName, int block_size,long data_speed):
+iq_data_reader::iq_data_reader(string fileName, long block_size,long data_speed):
 	file(new ifstream(fileName,ifstream::binary)),block_size(block_size),data_speed(data_speed)
 {
 	DLOG(INFO) << "constructor";
@@ -40,9 +40,10 @@ int iq_data_reader::read_data(vector<complex<double>> &data){
 		}
 	}
 
-
+//		cout << "!!!!!!!!!!!!!!!!!!!!!!!!" << dataToSend << endl;
 //	data.clear();
 	if (file->eof()){
+	//	return -1;
 		file->clear();
 		file->seekg(0,ios::beg);
 	}
@@ -51,7 +52,6 @@ int iq_data_reader::read_data(vector<complex<double>> &data){
 	complex<double> cnumber;
 	unsigned char d_real,d_imag;
 	file->read(buffer,dataToSend * 2);
-	// iint j=0;
 	for (int i=0;i<dataToSend*2;i+=2){
  	    d_real = buffer[i];
 		d_imag = buffer[i+1];

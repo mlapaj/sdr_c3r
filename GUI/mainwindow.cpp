@@ -23,6 +23,10 @@ void MainWindow::updateSpectrum(vector<complex<double>> spectrum){
 	ui->qspectrum->addSpectrumData(spectrum);
 }
 
+void MainWindow::updateSpectrum2(vector<complex<double>> spectrum){
+	ui->qspectrum2->addSpectrumData(spectrum);
+}
+
 void MainWindow::handleCheckbox(){
 	if (!ui->checkBox->isChecked()){
 		ui->qspectrum->setZeroAtCenter(true);

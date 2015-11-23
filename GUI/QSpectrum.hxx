@@ -41,7 +41,6 @@ public:
 	}
 	void subscribeFrequencyChange(function<void(long,long)> callback){
 		freqChangeCallback = callback;
-		freqChangeCallback(1,1);
 	}
 
 	long getSelectedWidth(){
@@ -87,4 +86,10 @@ private:
 	long selectedFreqWidthSize;
 	function<void(long,long)> freqChangeCallback;
 	bool canChangeSelectedFrequency;
+	
+	// TODO: fix this
+	int dupa;
+	vector<int> ppp_data;
+	vector<int> pp_data;
+	vector<int> p_data;
 };

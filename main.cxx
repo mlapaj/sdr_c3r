@@ -35,8 +35,8 @@ int main(int argc,char **argv){
 	google::InitGoogleLogging(argv[0]);
 	int nPoints;
 	LOG(INFO) << "Starting app..";
-
-	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",8192));
+    // radioFileSignal can have maximum 2xsampleRate buffer
+	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",2500000));
 	unique_ptr<radio> oRadio(new radio(oSignal));
     oRadio->start();	
 	return app.exec();

@@ -13,18 +13,24 @@ using namespace std;
 void funk(QRgb *pixels);
 #define D_WIDTH 1024
 QSpectrum::QSpectrum(QWidget *parent):QWidget(parent){
+	//setAttribute(Qt::WA_PaintOnScreen);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+	setAttribute(Qt::WA_NoSystemBackground);
 	DLOG(INFO) << "constructor started";
 	pixels = new QRgb[D_WIDTH*height()*2];
 	image = new QImage((uchar*)pixels, D_WIDTH, height()*2, QImage::Format_ARGB32);
 
 	prepareDisplay(pixels);
 	connect( &timer, SIGNAL( timeout() ), SLOT( changeT() ) );
-	timer.start( 10 );
+	timer.start( 30 );
     CreatePalete();
 	zeroAtCenter = true;
 	selectedFreqPos = 0;
 	selectedFreqWidth = 0;
 	canChangeSelectedFrequency = false;
+	p_data.resize(1024);
+	pp_data.resize(1024);
+	ppp_data.resize(1024);
 }
 
 
@@ -33,7 +39,7 @@ void QSpectrum::setZeroAtCenter(bool param){
 }
 
 
-int dupa;
+
 void QSpectrum::prepareDisplay(QRgb *pixels){
 	dupa = height();
 }
@@ -69,9 +75,6 @@ bool abs_part ( const std::complex<double> & lhs ,
 	return abs(lhs) < abs(rhs);
 }
 
-vector<int> ppp_data(1024);
-vector<int> pp_data(1024);
-vector<int> p_data(1024);
 void QSpectrum::drawLine(QRgb *pixels,vector<int> data){
 		for (int x = 0; x < D_WIDTH && x < data.size(); ++x) {
 			int ccol = (1*data[x] + 1 * p_data[x] + 1 *pp_data[x] + 1 * ppp_data[x])/4;
@@ -113,7 +116,6 @@ void QSpectrum::paintEvent(QPaintEvent *event){
 	if (!( dupa % 100))
 	qDebug() << "drawImage time:" << time.elapsed() / (float) 1000 << " seconds.";
 
-
 }
 
 void QSpectrum::resizeEvent(QResizeEvent* event)
@@ -128,14 +130,16 @@ void QSpectrum::resizeEvent(QResizeEvent* event)
 	
 	updateFreqPos();
 	prepareDisplay(pixels);
-	timer.start(10);
+	timer.start(30);
 	// trza dorzucic locka
 	
 	QWidget::resizeEvent(event);
 }
 
 void QSpectrum::changeT(){
+	if (!data.empty()){
 	update();
+	}
 }
 
 

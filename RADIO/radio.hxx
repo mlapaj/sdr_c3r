@@ -24,7 +24,7 @@ class radio: public QThread
 		}
 		void test(long jeden, long dwa){
 			shiftFrequency = jeden - signalFrequency;
-			qDebug() << "shift" << shiftFrequency << endl;
+			qDebug() << "!!shift" << shiftFrequency << endl;
 		calculateFrequencyValues();
 		calculateShiftSine();
 		}

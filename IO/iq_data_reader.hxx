@@ -11,7 +11,7 @@ using namespace std;
 class iq_data_reader
 {
 public:
-	iq_data_reader(string fileName,int block_size, long data_speed = 0);
+	iq_data_reader(string fileName,long block_size, long data_speed = 0);
 	int read_data(vector<complex<double>> &data);
 	virtual ~iq_data_reader ();
 

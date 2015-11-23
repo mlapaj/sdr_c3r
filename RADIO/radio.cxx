@@ -68,6 +68,7 @@ void radio::processRadio(){
 	decimate::segment_decimate<complex<double>> oDecimate(downSampleFactor);
 	vector<complex<double>> signalDecimated;
 	vector<complex<double>> signalSpectrum;
+	vector<complex<double>> signalSpectrum2;
 	vector<complex<double>> signalAfterDecimation;
 	vector<double> demodulatedSignal;
 
@@ -75,41 +76,65 @@ void radio::processRadio(){
 
 	vector<double> audio;
 	vector<complex<double>> signalInput;
-	
+	vector<complex<double>> restSamples;
+
 	signalInput.reserve(1024 * downSampleFactor);
 	signalAfterDecimation.reserve(1024);
 	signalDecimated.reserve(10240);
 	signalSpectrum.reserve(1024);
+	signalSpectrum2.reserve(1024);
 
 	t.reset();
 	while(!quit)
 	{
 		while (signalDecimated.size() < 10240){
 			signalInput.clear();
-			while (signalInput.size() < 1024)
+			signalInput.insert(signalInput.begin(),restSamples.begin(),restSamples.end());
+			restSamples.clear();
+			while (signalInput.size() <= 1024)
 			{
-				if (signal->getSignal(signalInput) == 0){
+				int retVal = signal->getSignal(signalInput); 
+				if (retVal == 0){
 					continue;
-				}
+				} 
+				else if (retVal < 0)
+				{
+					quit = true;
+					break;
+				}	
+				
 			}
+			if (quit) break;
+			// copy not processed bytes
+			// size of signalInput must be at least 1024
+			int val = signalInput.size() - 1024;
+			restSamples.insert(restSamples.begin(),signalInput.end()-val,signalInput.end());
+			signalInput.resize(1024);
+
+
 			oFFT->do_fft(signalInput,signalSpectrum);
+			
 			//do frequency shift
 			for (int i = 0;i < (int) signalInput.size() ; ++i)
 			{
 				signalInput[i] *= (shiftSine[sinePhase++]);
 				if (sinePhase >= (int) shiftSine.size()) sinePhase = 0;
 			}
+			
 
 			oDecimate.decimate(signalInput,signalAfterDecimation);
 			signalDecimated.insert(signalDecimated.end(),signalAfterDecimation.begin(),signalAfterDecimation.end());
 			signalAfterDecimation.clear();
+			
 		}
 
 		oWFMdecoder->decode(signalDecimated,audio);
+		oFFT->do_fft(audio,signalSpectrum2);
 		
 		mainWindow->updateSpectrum(signalSpectrum);
 
-		saveRawDataToFile("data.bin",audio);
+		mainWindow->updateSpectrum2(signalSpectrum2);
+		//saveRawDataToFile("data.bin",audio);
 		signalDecimated.clear();
 		signalSpectrum.clear();
 
