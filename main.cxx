@@ -11,8 +11,11 @@
 
 #include "DSP/filter.hxx"
 #include "DSP/fourier.hxx"
+
 #include "IO/csv.hxx"
 #include "IO/iq_data_reader.hxx"
+#include "IO/audioOutput.hxx"
+
 #include "RADIO/radioFileSignal.cxx"
 #include "RADIO/radio.hxx"
 
@@ -38,6 +41,7 @@ int main(int argc,char **argv){
     // radioFileSignal can have maximum 2xsampleRate buffer
 	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",2500000));
 	unique_ptr<radio> oRadio(new radio(oSignal));
+	unique_ptr<audioOutput> oAudioOutput(new audioOutput());
     oRadio->start();	
 	return app.exec();
 

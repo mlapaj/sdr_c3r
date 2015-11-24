@@ -32,11 +32,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 find_package (GLog REQUIRED)
 
 add_subdirectory(DSP)
-add_subdirectory(IO)
 add_subdirectory(MISC)
 add_subdirectory(RADIO)
 add_subdirectory(GUI)
-
+add_subdirectory(IO)
 
 # for main program
 add_executable(sdr_c3r main.cxx)
