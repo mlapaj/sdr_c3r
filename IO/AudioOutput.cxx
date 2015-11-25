@@ -1,4 +1,5 @@
 #include "AudioOutput.hxx"
+
 using namespace std;
 const int DataSampleRateHz = 44100;
 
@@ -14,7 +15,7 @@ void AudioOutput::init()
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
+    format.setSampleType(QAudioFormat::Float);
 
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
     if (!info.isFormatSupported(format)) {
@@ -33,6 +34,8 @@ void AudioOutput::createAudioOutput()
     delete audioOutput;
     audioOutput = 0;
     audioOutput = new QAudioOutput(device, format, this);
-    audioOutput->start(audioSamples);
+	audioSamples->audioBuffer = audioBuffer;
+	audioSamples->start();
+    audioOutput->start(audioSamples.get());
 
 }

@@ -18,6 +18,7 @@ class Radio: public QThread
 	public:
 		Radio (shared_ptr<RadioSignal> signal);
 		virtual ~Radio ();
+		list<vector<float>> audioBuffer;
 	private:
 		void run(){
 			processRadio();
@@ -46,6 +47,7 @@ class Radio: public QThread
 		shared_ptr<fft> oFFT;
 		shared_ptr<WFMdecoder<double>> oWFMdecoder;
 		vector<complex<double>> shiftSine;
+		// list<vector<double>> audioBuffer;
 		
 		void calculateShiftSine();
 		

@@ -42,8 +42,9 @@ int main(int argc,char **argv){
 	shared_ptr<RadioFileSignal> signal(new RadioFileSignal("test_data/FMcapture2.dat",8192));
 	signal->setThrottle(2500000);
 	unique_ptr<Radio> radio(new Radio(signal));
-	// unique_ptr<AudioOutput> audioOutput(new AudioOutput());
-	//audioOutput->init();
+	unique_ptr<AudioOutput> audioOutput(new AudioOutput());
+	audioOutput->audioBuffer = &(radio->audioBuffer);
+	audioOutput->init();
     radio->start();	
 	return app.exec();
 

@@ -84,6 +84,7 @@ void Radio::processRadio(){
 	signalSpectrum.reserve(1024);
 	signalSpectrum2.reserve(1024);
 
+	vector<float> toBuffer;
 	t.reset();
 	while(!quit)
 	{
@@ -130,6 +131,13 @@ void Radio::processRadio(){
 		}
 
 		oWFMdecoder->decode(signalDecimated,audio);
+		for (double x: audio){
+			toBuffer.push_back(x);
+		}
+		cout << endl << "toBuffer size: " <<  toBuffer.size() << endl;
+		audioBuffer.push_back(toBuffer);
+		toBuffer.clear();
+
 		oFFT->do_fft(audio,signalSpectrum2);
 		
 		mainWindow->updateSpectrum(signalSpectrum);
