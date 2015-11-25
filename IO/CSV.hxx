@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace csv{
+namespace CSV{
 	template <typename T>
 		int read(string filename,vector<complex<T>> &array,int howMany = 0){
 			ifstream file(filename);

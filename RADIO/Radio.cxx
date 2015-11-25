@@ -1,16 +1,16 @@
-#include "radio.hxx"
+#include "Radio.hxx"
 #include <iostream>
 #include <fstream>
 #include <glog/logging.h>
 #include <QThread>
 #include "../DSP/decimate.hxx"
-#include "../IO/csv.hxx"
+#include "../IO/CSV.hxx"
 
 #include <functional>
 using namespace std;
 using namespace std::placeholders;
 
-radio::radio(shared_ptr<radioSignal> signal)
+Radio::Radio(shared_ptr<RadioSignal> signal)
 	:signal(signal),mainWindow(new MainWindow()),oWFMdecoder(new WFMdecoder<double>(10240)),
 	oFFT(new fft(1024)){
 	DLOG(INFO) << "created constructor";
@@ -20,10 +20,10 @@ radio::radio(shared_ptr<radioSignal> signal)
 	// shiftFrequency = 178000;
     shiftFrequency = 978000;
 	calculateShiftSine();
-	mainWindow->subscribeFrequencyChange(bind(&radio::test, this, _1, _2));
+	mainWindow->subscribeFrequencyChange(bind(&Radio::test, this, _1, _2));
 	}
 
-void radio::calculateFrequencyValues(){
+void Radio::calculateFrequencyValues(){
 	maxTuneOffset = signalSamplingRate * 0.5;
 	maxFrequency = signalFrequency + maxTuneOffset;
 	minFrequency = signalFrequency - maxTuneOffset;
@@ -39,12 +39,12 @@ void radio::calculateFrequencyValues(){
 
 }
 
-radio::~radio(){
+Radio::~Radio(){
 	DLOG(INFO) << "dectructor";
 
 }
 
-void radio::calculateShiftSine(){
+void Radio::calculateShiftSine(){
 	shiftSine.clear();
 	// TODO: get size of sine
 	int val = 0;
@@ -58,10 +58,10 @@ void radio::calculateShiftSine(){
 }
 
 
-void radio::processRadio(){
+void Radio::processRadio(){
 	calculateFrequencyValues();
 
-	benchmark_timer t;
+	BenchmarkTimer t;
 	bool quit = false;
 	
 	int downSampleFactor = 8;
@@ -91,7 +91,8 @@ void radio::processRadio(){
 			signalInput.clear();
 			signalInput.insert(signalInput.begin(),restSamples.begin(),restSamples.end());
 			restSamples.clear();
-			while (signalInput.size() <= 1024)
+			
+			while (signalInput.size() < 8192)
 			{
 				int retVal = signal->getSignal(signalInput); 
 				if (retVal == 0){
@@ -103,14 +104,14 @@ void radio::processRadio(){
 					break;
 				}	
 				
-			}
+			}				
 			if (quit) break;
 			// copy not processed bytes
 			// size of signalInput must be at least 1024
-			int val = signalInput.size() - 1024;
+			int val = signalInput.size() - 8192;
 			restSamples.insert(restSamples.begin(),signalInput.end()-val,signalInput.end());
-			signalInput.resize(1024);
-
+			signalInput.resize(8192);
+			
 
 			oFFT->do_fft(signalInput,signalSpectrum);
 			
@@ -134,18 +135,18 @@ void radio::processRadio(){
 		mainWindow->updateSpectrum(signalSpectrum);
 
 		mainWindow->updateSpectrum2(signalSpectrum2);
-		//saveRawDataToFile("data.bin",audio);
+		saveRawDataToFile("data.bin",audio);
 		signalDecimated.clear();
 		signalSpectrum.clear();
 
 	}
 	t.print();
-	cout << "end of radio processing" << endl;
+	cout << "end of Radio processing" << endl;
 
 
 }
 
-void radio::saveRawDataToFile(string filename,vector<double> data){
+void Radio::saveRawDataToFile(string filename,vector<double> data){
 			ofstream data_file;      // pay attention here! ofstream
 			data_file.open(filename, ios::in | ios::out | ios::binary);
 			data_file.seekp(0, ios::end); 

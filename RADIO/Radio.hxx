@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-#include "radioSignal.hxx"
+#include "RadioSignal.hxx"
 #include "WFMdecoder.hxx"
 
 #include "../GUI/mainwindow.h"
@@ -13,11 +13,11 @@
 
 
 #include <QtCore>
-class radio: public QThread
+class Radio: public QThread
 {
 	public:
-		radio (shared_ptr<radioSignal> signal);
-		virtual ~radio ();
+		Radio (shared_ptr<RadioSignal> signal);
+		virtual ~Radio ();
 	private:
 		void run(){
 			processRadio();
@@ -29,7 +29,7 @@ class radio: public QThread
 		calculateShiftSine();
 		}
 		void processRadio();
-		long signalSamplingRate = 0; // radio sampling rate
+		long signalSamplingRate = 0; // Radio sampling rate
 		long signalFrequency = 0;
 		long maxTuneOffset = 0;
 		long maxFrequency = 0;
@@ -40,8 +40,8 @@ class radio: public QThread
 		long maxSinePhase = 0;
 		long shiftFrequency = 0;
 
-		// radio object
-		shared_ptr<radioSignal> signal;
+		// Radio object
+		shared_ptr<RadioSignal> signal;
 		shared_ptr<MainWindow> mainWindow;
 		shared_ptr<fft> oFFT;
 		shared_ptr<WFMdecoder<double>> oWFMdecoder;

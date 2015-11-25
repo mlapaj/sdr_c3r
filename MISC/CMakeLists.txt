@@ -1,1 +1,1 @@
-add_library(MISC benchmark_timer.cxx)
+add_library(MISC BenchmarkTimer.cxx)

@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <complex>
 #include <vector>
-#include "../MISC/benchmark_timer.hxx"
+#include "../MISC/BenchmarkTimer.hxx"
 
 using namespace std;
 

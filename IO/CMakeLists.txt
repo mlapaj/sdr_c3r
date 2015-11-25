@@ -18,5 +18,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_library(IO iq_data_reader.cxx audioOutput.cxx )
+add_library(IO IqDataReader.cxx AudioOutput.cxx )
 target_link_libraries (IO Qt5::Widgets Qt5::Multimedia) 

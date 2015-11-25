@@ -2,8 +2,8 @@
 #include "DSP/fourier.hxx"
 #include "DSP/fft.hxx"
 #include "DSP/convolution.hxx"
-#include "IO/csv.hxx"
-#include "MISC/benchmark_timer.hxx"
+#include "IO/CSV.hxx"
+#include "MISC/BenchmarkTimer.hxx"
 
 #include <vector>
 #include <sstream>
@@ -24,13 +24,13 @@ TEST(DSPTest, Fourier_Complex) {
 		vector<complex<double>> compare;
 		fourier oFourier(nPoints);
 
-		csv::read(samples_dir+complex_samples,data,nPoints);
-		benchmark_timer t;
+		CSV::read(samples_dir+complex_samples,data,nPoints);
+		BenchmarkTimer t;
 		oFourier.do_fourier(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),compare,nPoints);
+		CSV::read(ss.str(),compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
@@ -50,13 +50,13 @@ TEST(DSPTest, Fourier) {
 		vector<complex<double>> out;
 		vector<complex<double>> compare;
 		fourier oFourier(nPoints);
-		csv::read(samples_dir+samples,data,nPoints);
-		benchmark_timer t;
+		CSV::read(samples_dir+samples,data,nPoints);
+		BenchmarkTimer t;
 		oFourier.do_fourier(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
-		csv::read(ss.str(),compare,nPoints);
+		CSV::read(ss.str(),compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
@@ -78,12 +78,12 @@ TEST(DSPTest, Inv_Fourier_Complex) {
 
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFourier.do_inv_fourier(data,out);
 		t.print();
-		csv::read(samples_dir+complex_samples,compare,nPoints);
+		CSV::read(samples_dir+complex_samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
@@ -106,12 +106,12 @@ TEST(DSPTest, Inv_Fourier) {
 
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFourier.do_inv_fourier(data,out);
 		t.print();
-		csv::read(samples_dir+samples,compare,nPoints);
+		CSV::read(samples_dir+samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i],compare[i],0.00001);
@@ -130,14 +130,14 @@ TEST(DSPTest, FFT_Complex) {
 		vector<complex<double>> compare;
 		fft oFFT(nPoints);
 
-		csv::read(samples_dir+complex_samples,data,nPoints);
+		CSV::read(samples_dir+complex_samples,data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFFT.do_fft(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),compare,nPoints);
+		CSV::read(ss.str(),compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
@@ -157,14 +157,14 @@ TEST(DSPTest, FFT) {
 		vector<complex<double>> compare;
 		fft oFFT(nPoints);
 
-		csv::read(samples_dir+samples,data,nPoints);
+		CSV::read(samples_dir+samples,data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFFT.do_fft(data,out);
 		t.print();
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
-		csv::read(ss.str(),compare,nPoints);
+		CSV::read(ss.str(),compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.0001);
@@ -185,12 +185,12 @@ TEST(DSPTest, Inv_FFT_Complex) {
 
 		stringstream ss;
 		ss << samples_dir << complex_samples_dft << nPoints;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFFT.do_inv_fft(data,out);
 		t.print();
-		csv::read(samples_dir+complex_samples,compare,nPoints);
+		CSV::read(samples_dir+complex_samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i].real(),compare[i].real(),0.00001);
@@ -212,12 +212,12 @@ TEST(DSPTest, Inv_FFT) {
 
 		stringstream ss;
 		ss << samples_dir << samples_dft << nPoints;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		oFFT.do_inv_fft(data,out);
 		t.print();
-		csv::read(samples_dir+samples,compare,nPoints);
+		CSV::read(samples_dir+samples,compare,nPoints);
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
 			EXPECT_NEAR(out[i],compare[i],0.00001);
@@ -238,21 +238,21 @@ TEST(DSPTest, Convolution) {
 
 		stringstream ss;
 		ss << samples_dir << samples;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
 		ss.str("");
 		ss << samples_dir << "impulse";
 		cout << ss.str() << endl;
-		csv::read(ss.str(),impulse);
+		CSV::read(ss.str(),impulse);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		convolution::do_conv(data,impulse,out);
 		t.print();
 		cout << endl;
 
 		ss.str("");
 		ss << samples_dir << "conv_" << nPoints;
-		csv::read(ss.str(),compare);
+		CSV::read(ss.str(),compare);
 
 		EXPECT_EQ(out.size(), compare.size());
 		for (int i=0;i<compare.size();i++){
@@ -275,14 +275,14 @@ TEST(DSPTest, Convolution_Segment) {
 
 		stringstream ss;
 		ss << samples_dir << samples;
-		csv::read(ss.str(),data,nPoints);
+		CSV::read(ss.str(),data,nPoints);
 
 		ss.str("");
 		ss << samples_dir << "impulse";
 		cout << ss.str() << endl;
-		csv::read(ss.str(),impulse);
+		CSV::read(ss.str(),impulse);
 
-		benchmark_timer t;
+		BenchmarkTimer t;
 		int j = 0;
 		vector<double> overlap;
 		vector<double> out_final;
@@ -302,7 +302,7 @@ TEST(DSPTest, Convolution_Segment) {
 
 		ss.str("");
 		ss << samples_dir << "conv_" << nPoints;
-		csv::read(ss.str(),compare);
+		CSV::read(ss.str(),compare);
 
 		EXPECT_EQ(out_final.size(), compare.size());
 		for (int i=0;i<compare.size();i++){

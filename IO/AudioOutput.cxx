@@ -1,10 +1,11 @@
-#include "audioOutput.hxx"
+#include "AudioOutput.hxx"
+using namespace std;
 const int DataSampleRateHz = 44100;
 
-void audioOutput::init()
+void AudioOutput::init()
 {
     // connect(pushTimer, SIGNAL(timeout()), SLOT(pushTimerExpired()));
-	
+	cout << "!!!!!!!" << endl;
 
     pullMode = true;
 
@@ -20,17 +21,18 @@ void audioOutput::init()
         qWarning() << "Default format not supported - trying to use nearest";
         format = info.nearestFormat(format);
     }
+	qDebug() << "!!" << endl;
 
 //    m_generator = new Generator(m_format, DurationSeconds*1000000, ToneSampleRateHz, this);
     createAudioOutput();
 }
 
 
-void audioOutput::createAudioOutput()
+void AudioOutput::createAudioOutput()
 {
-    delete oAudioOutput;
-    oAudioOutput = 0;
-    oAudioOutput = new QAudioOutput(device, format, this);
-    oAudioOutput->start(oAudioSamples);
+    delete audioOutput;
+    audioOutput = 0;
+    audioOutput = new QAudioOutput(device, format, this);
+    audioOutput->start(audioSamples);
 
 }

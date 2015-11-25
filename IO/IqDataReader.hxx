@@ -8,18 +8,17 @@
 
 using namespace std;
 
-class iq_data_reader
+class IqDataReader
 {
 public:
-	iq_data_reader(string fileName,long block_size, long data_speed = 0);
-	int read_data(vector<complex<double>> &data);
-	virtual ~iq_data_reader ();
+	IqDataReader(string fileName,long block_size,bool repeat = false);
+	int readData(vector<complex<double>> &data,int bytes = 0);
+	virtual ~IqDataReader ();
 
 private:
-	long data_speed;
-	time_t timer;
 	unique_ptr<ifstream> file;
 	int block_size;
 	char *buffer;
+	bool repeat;
 	/* data */
 };

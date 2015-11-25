@@ -1,15 +1,15 @@
-#include "benchmark_timer.hxx"
+#include "BenchmarkTimer.hxx"
 #include <iostream>
 
-benchmark_timer::benchmark_timer(){
+BenchmarkTimer::BenchmarkTimer(){
 	m_start = clock();
 }
 
-void benchmark_timer::reset(){
+void BenchmarkTimer::reset(){
 	m_start = clock();
 }
 
-void benchmark_timer::print(){
+void BenchmarkTimer::print(){
 	const int clocks = clock()-m_start;
 	std::cout<<"Time elapsed: "<< clocks/float(CLOCKS_PER_SEC)<< " ( " << clocks << " clocks)"<<std::endl;
 }

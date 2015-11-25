@@ -1,13 +1,13 @@
 #pragma once
 #include <ctime>
 
-class benchmark_timer
+class BenchmarkTimer
 {
 public:
-	benchmark_timer ();
+	BenchmarkTimer ();
 	void print();
 	void reset();
-	virtual ~benchmark_timer (){};
+	virtual ~BenchmarkTimer (){};
 
 private:
 	/* data */

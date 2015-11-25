@@ -12,12 +12,12 @@
 #include "DSP/filter.hxx"
 #include "DSP/fourier.hxx"
 
-#include "IO/csv.hxx"
-#include "IO/iq_data_reader.hxx"
-#include "IO/audioOutput.hxx"
+#include "IO/CSV.hxx"
+#include "IO/IqDataReader.hxx"
+#include "IO/AudioOutput.hxx"
 
-#include "RADIO/radioFileSignal.cxx"
-#include "RADIO/radio.hxx"
+#include "RADIO/RadioFileSignal.cxx"
+#include "RADIO/Radio.hxx"
 
 #include "GUI/QSpectrum.hxx"
 #include "GUI/mainwindow.h"
@@ -38,11 +38,13 @@ int main(int argc,char **argv){
 	google::InitGoogleLogging(argv[0]);
 	int nPoints;
 	LOG(INFO) << "Starting app..";
-    // radioFileSignal can have maximum 2xsampleRate buffer
-	shared_ptr<radioSignal> oSignal(new radioFileSignal("test_data/FMcapture1.dat",2500000));
-	unique_ptr<radio> oRadio(new radio(oSignal));
-	unique_ptr<audioOutput> oAudioOutput(new audioOutput());
-    oRadio->start();	
+
+	shared_ptr<RadioFileSignal> signal(new RadioFileSignal("test_data/FMcapture2.dat",8192));
+	signal->setThrottle(2500000);
+	unique_ptr<Radio> radio(new Radio(signal));
+	// unique_ptr<AudioOutput> audioOutput(new AudioOutput());
+	//audioOutput->init();
+    radio->start();	
 	return app.exec();
 
 	DLOG(INFO) << "Ending app..";
