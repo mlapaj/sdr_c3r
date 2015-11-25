@@ -21,16 +21,16 @@ class AudioSamples : public QIODevice
 		qint64 readData(char *data, qint64 maxlen){
 			long dataSent = 0;
 			if (audioBuffer->empty()) return 0;
-			vector<float> &currentBuffer = audioBuffer->front();
+			vector<qint16> &currentBuffer = audioBuffer->front();
 			cout << "currentBufferLen " << currentBuffer.size() << endl;
 			if ((int)currentBuffer.size() <= maxlen){
 				cout << maxlen << endl;
 				for (int i=0;i<currentBuffer.size();i++){
-					for (int j=0;j<4;j++){
+					for (int j=0;j<2;j++){
 						cout << "data" << currentBuffer[i] << endl;
 						if (dataSent>maxlen) break;
-//						data[dataSent++] = ((char *)&(currentBuffer[i]))[4-j];
-						data[dataSent++] = 0;
+						data[dataSent++] = ((char *)&(currentBuffer[i]))[4-j];
+//						data[dataSent++] = 0;
 					}
 				}
 				audioBuffer->pop_front();
@@ -52,7 +52,7 @@ class AudioSamples : public QIODevice
 		
 		}
 //	private:
-		list<vector<float>> *audioBuffer;
+		list<vector<qint16>> *audioBuffer;
 };
 
 class AudioOutput: public QObject
@@ -60,7 +60,7 @@ class AudioOutput: public QObject
 
 
 public:
-	list<vector<float>> *audioBuffer;
+	list<vector<qint16>> *audioBuffer;
 	AudioOutput ():
 		audioOutput(0),
 		device(QAudioDeviceInfo::defaultOutputDevice()),
