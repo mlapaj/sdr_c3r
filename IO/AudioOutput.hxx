@@ -29,7 +29,7 @@ class AudioSamples : public QIODevice
 					for (int j=0;j<2;j++){
 						cout << "data" << currentBuffer[i] << endl;
 						if (dataSent>maxlen) break;
-						data[dataSent++] = ((char *)&(currentBuffer[i]))[4-j];
+						data[dataSent++] = ((char *)&(currentBuffer[i]))[2-j];
 //						data[dataSent++] = 0;
 					}
 				}

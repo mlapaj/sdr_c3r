@@ -18,7 +18,7 @@ class Radio: public QThread
 	public:
 		Radio (shared_ptr<RadioSignal> signal);
 		virtual ~Radio ();
-		list<vector<float>> audioBuffer;
+		list<vector<qint16>> audioBuffer;
 	private:
 		void run(){
 			processRadio();
