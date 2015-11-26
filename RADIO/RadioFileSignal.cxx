@@ -8,7 +8,7 @@
 RadioFileSignal::RadioFileSignal(string fileName,int bufferSize):
 	currentFileName(fileName),
 	currentBlockSize(bufferSize),
-	iq(new IqDataReader(fileName,bufferSize)){
+	iq(new IqDataReader(fileName,bufferSize,true)){
 		DLOG(INFO) << "created object";
 	timer = 0;
 }
@@ -75,7 +75,7 @@ long RadioFileSignal::getSignalFrequency(){
 void RadioFileSignal::setThrottle(long sampleRate){
 	timer = 0;
 	throttle = true;
-	iq.reset(new IqDataReader(currentFileName,sampleRate));
+	iq.reset(new IqDataReader(currentFileName,sampleRate,true));
 	this->sampleRate = sampleRate;
 	this->dataToSend = sampleRate;
 }

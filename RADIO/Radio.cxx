@@ -132,7 +132,7 @@ void Radio::processRadio(){
 
 		oWFMdecoder->decode(signalDecimated,audio);
 		for (double x: audio){
-			toBuffer.push_back(x * 65534);
+			toBuffer.push_back(x * 32768);
 		}
 		cout << endl << "toBuffer size: " <<  toBuffer.size() << endl;
 		audioBuffer.push_back(toBuffer);

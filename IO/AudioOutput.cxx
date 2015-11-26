@@ -1,7 +1,7 @@
 #include "AudioOutput.hxx"
 
 using namespace std;
-const int DataSampleRateHz = 44100;
+const int DataSampleRateHz = 31250;
 
 void AudioOutput::init()
 {
@@ -16,6 +16,7 @@ void AudioOutput::init()
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
+    //format.setSampleType(QAudioFormat::Float);
 
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
     if (!info.isFormatSupported(format)) {
